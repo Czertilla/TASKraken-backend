@@ -10,7 +10,7 @@ class AbstractRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def find_all():
+    async def search():
         raise NotImplementedError
 
     @abstractmethod
