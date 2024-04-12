@@ -63,7 +63,7 @@ class SQLAlchemyRepository(AbstractRepository):
         return (await self.execute(stmt)).scalar_one_or_none()
 
 
-    async def find_all(self, **filters) -> list[model]:
+    async def search(self, **filters) -> list[model]:
         stmt = select(self.model).filter_by(**filters)
         result = await self.execute(stmt)
         result = result.scalars().all()
