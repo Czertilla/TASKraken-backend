@@ -2,7 +2,7 @@ from uuid import UUID
 from database import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
-from utils.enums.feedback import Points
+from utils.enums import Points
 
 
 class FeedbackORM():
