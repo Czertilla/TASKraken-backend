@@ -12,7 +12,7 @@ get_superuser = fastapi_users.current_user(verified=True, superuser=True)
 
 structs_router = APIRouter(prefix="/struct", tags=["structures"])
 
-@structs_router.post()
+@structs_router.post("/regist")
 async def regist_organization(
     user: Annotated[UserORM, Depends(get_superuser)],
     uow: StructUOWDep,

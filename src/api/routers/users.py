@@ -11,7 +11,7 @@ verified_user = fastapi_users.current_user(verified=True, superuser=False)
 
 users_router = APIRouter(prefix="/specs", tags=["specialists"])
 
-@users_router.get()
+@users_router.get("/")
 async def get_some(
     user: Annotated[UserORM, Depends(verified_user)],
     uow: UsersUOWDep):
