@@ -18,6 +18,7 @@ class RoleORM(Base):
 
     user_id: Mapped[UUID|None] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
     name: Mapped[str]
+    level: Mapped[int] = mapped_column(default=0)
     structure_id: Mapped[UUID] = mapped_column(ForeignKey("structures.id", ondelete="CASCADE"))
     chief_id: Mapped[UUID|None] = mapped_column(ForeignKey("roles.id"), nullable=True)
 
