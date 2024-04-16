@@ -17,7 +17,7 @@ class ReportORM(Base):
     responsible_id: Mapped[UUID] = mapped_column(ForeignKey("roles.id", ondelete="SET NULL"))
     folder_id: Mapped[UUID] = mapped_column(ForeignKey("folders.id"))
     
-    folder: Mapped["FolderORM"] = relationship(back_populates="enclosure")
+    # folder: Mapped["FolderORM"] = relationship(back_populates="enclosure", foreign_keys=[folder_id])
     responsible: Mapped["RoleORM"] = relationship(back_populates="reports")
     task: Mapped["TaskORM"] = relationship(back_populates="reports")
 

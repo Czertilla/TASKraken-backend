@@ -71,10 +71,10 @@ class TaskORM(TaskProjectMixin, Base):
     project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id"))
     head_task_id: Mapped[UUID] = mapped_column(ForeignKey("tasks.id"), nullable=True)
 
-    head_task: Mapped[Optional["TaskORM"]] = relationship(back_populates="subtasks")
+    head_task: Mapped[Optional["TaskORM"]] = relationship(back_populates="subtasks", remote_side="TaskORM.id")
     project: Mapped["ProjectORM"] = relationship(back_populates="tasks")
     creator: Mapped["RoleORM"] = relationship(back_populates="created_tasks")
-    folder: Mapped["FolderORM"] = relationship(back_populates="enclosure")
+    # folder: Mapped["FolderORM"] = relationship(backref="enclosure", foreign_keys=[folder_id])
 
     subtasks: Mapped[list["TaskORM"]] = relationship(back_populates="head_task")
     responsibles: Mapped[list["RoleORM"]] = relationship(

@@ -22,8 +22,8 @@ class RoleORM(Base):
     chief_id: Mapped[UUID|None] = mapped_column(ForeignKey("roles.id"), nullable=True)
 
     user: Mapped["UserORM"] = relationship(back_populates="roles")
-    chief: Mapped["RoleORM"] = relationship(back_populates="subordinates")
-    structure: Mapped["StructureORM"] = relationship(back_populates="staff")
+    chief: Mapped["RoleORM"] = relationship(back_populates="subordinates", remote_side="RoleORM.id")
+    structure: Mapped["StructureORM"] = relationship(back_populates="staff", foreign_keys=[structure_id])
     
     subordinates: Mapped[list["RoleORM"]] = relationship(back_populates="chief")
     created_projects: Mapped[list["ProjectORM"]] = relationship(back_populates="creator")

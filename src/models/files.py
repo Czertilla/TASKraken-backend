@@ -15,11 +15,11 @@ class FolderORM(Base):
     
     head_folder_id: Mapped[UUID] = mapped_column(ForeignKey("folders.id", ondelete='CASCADE'), nullable=True)
 
-    head_folder: Mapped["FolderORM"] = relationship(back_populates="folders")
+    head_folder: Mapped["FolderORM"] = relationship(back_populates="folders", remote_side="FolderORM.id")
 
     files: Mapped[list["FileORM"]] = relationship(back_populates="folder")
-    folders: Mapped[list["FolderORM"]] = relationship(back_populates=head_folder)
-    enclosure: Mapped[Union["TaskORM","ReportORM"]] = relationship(back_populates="folder")
+    folders: Mapped[list["FolderORM"]] = relationship(back_populates="head_folder")
+    # enclosure: Mapped[Union["TaskORM","ReportORM"]] = relationship(back_populates="folder")
 
 
 class FileORM(Base):
