@@ -24,6 +24,7 @@ class ProjectORM(TaskProjectMixin, Base):
 
     tasks: Mapped[list["TaskORM"]] = relationship(back_populates="project")
 
+
 class TaskORM(TaskProjectMixin, Base):
     __tablename__ = "tasks"
 

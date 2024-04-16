@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from models.users import UserORM
     from models.structures import StructureORM
     from models.tasks import ProjectORM, TaskORM
+    from models.rights import RoleRightORM
+
 
 class RoleORM(Base):
     __tablename__ = "roles"

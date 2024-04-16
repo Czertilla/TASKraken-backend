@@ -6,7 +6,6 @@ from database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
 
-from models.files import FolderORM
 
 if TYPE_CHECKING:
     from models.roles import RoleORM

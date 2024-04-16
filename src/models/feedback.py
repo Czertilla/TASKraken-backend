@@ -1,8 +1,6 @@
-from enum import Enum
-from typing import TYPE_CHECKING, Union
 from uuid import UUID
 from database import Base
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
 from utils.enums.feedback import Points
 
