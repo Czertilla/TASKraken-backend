@@ -1,6 +1,8 @@
 from .users import users_router
+from .structures import structs_router
 routers = (
-    users_router
+    users_router,
+    structs_router
 )
 
 from fastapi import FastAPI
