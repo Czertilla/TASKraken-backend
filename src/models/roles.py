@@ -27,6 +27,7 @@ class RoleORM(Base):
     user: Mapped["UserORM"] = relationship(back_populates="roles")
     chief: Mapped["RoleORM"] = relationship(back_populates="subordinates", remote_side="RoleORM.id")
     structure: Mapped["StructureORM"] = relationship(back_populates="staff", foreign_keys=[structure_id])
+    rights: Mapped["RoleRightORM"] = relationship(back_populates="role")
     
     subordinates: Mapped[list["RoleORM"]] = relationship(back_populates="chief")
     created_projects: Mapped[list["ProjectORM"]] = relationship(back_populates="creator")
