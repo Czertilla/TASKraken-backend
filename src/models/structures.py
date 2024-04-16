@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class StructureORM(Base):
     __tablename__ = "structures"
 
-    head_id: Mapped[UUID] = mapped_column(ForeignKey("roles.id"))
+    head_id: Mapped[UUID|None] = mapped_column(ForeignKey("roles.id", ondelete="SET NULL"), nullable=True)
     name: Mapped[str]
     desctription: Mapped[str] = mapped_column(default="")
     enclosure_id: Mapped[UUID|None] = mapped_column(ForeignKey("structures.id", ondelete="CASCADE"), nullable=True)
