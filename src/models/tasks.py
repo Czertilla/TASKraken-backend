@@ -20,40 +20,6 @@ class TaskStatus(Enum):
     closed = "closed"
     completed = "completed"
 
-class TaskProjectMixin:
-    @declared_attr
-    def name(cls) ->  Mapped[str]:
-        return mapped_column(nullable=False)
-    
-    @declared_attr
-    def desctription(cls) -> Mapped[str]:
-        return mapped_column(default="")
-    
-    @declared_attr
-    def created_at(cls) -> Mapped[datetime]:
-        return mapped_column(default=func.now())
-    
-    @declared_attr
-    def creator_id(cls) -> Mapped[UUID]:
-        return mapped_column(ForeignKey("roles.id"))
-    
-    @declared_attr
-    def edited_at(cls) -> Mapped[datetime|None]:
-        return mapped_column(onupdate=func.now)
-    
-    @declared_attr
-    def deadline(cls) -> Mapped[datetime|None]:
-        return mapped_column(nullable=True)
-    
-    @declared_attr
-    def status(cls) -> Mapped[TaskStatus]:
-        return mapped_column(default=TaskStatus.created)
-    
-    @declared_attr
-    def status_timestamp(cls) -> Mapped[datetime]:
-        return mapped_column(default=func.now())
-
-
 class ProjectORM(TaskProjectMixin, Base):
     __tablename__ = "projects"
 
