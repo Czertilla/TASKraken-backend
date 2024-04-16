@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING, Optional
 from uuid import UUID
 from database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy import ForeignKey, func
+from sqlalchemy import ForeignKey
+from utils.mixins.advanced_orm import TaskProjectMixin
 
 
 if TYPE_CHECKING:
