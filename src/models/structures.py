@@ -16,8 +16,8 @@ class StructureORM(Base):
     desctription: Mapped[str] = mapped_column(default="")
     enclosure_id: Mapped[UUID|None] = mapped_column(ForeignKey("structures.id", ondelete="CASCADE"), nullable=True)
 
-    enclosure: Mapped["StructureORM"] = relationship(back_populates="substructures")
+    enclosure: Mapped["StructureORM"] = relationship(back_populates="substructures", remote_side="StructureORM.id")
 
     substructures: Mapped[list["StructureORM"]] = relationship(back_populates="enclosure")
-    staff: Mapped[list["RoleORM"]] = relationship(back_populates="structure")
+    staff: Mapped[list["RoleORM"]] = relationship(back_populates="structure", foreign_keys="RoleORM.structure_id")
     projects: Mapped[list["ProjectORM"]] = relationship(back_populates="organization")
