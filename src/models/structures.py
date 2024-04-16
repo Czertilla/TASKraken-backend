@@ -3,12 +3,15 @@ from uuid import UUID
 from database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
+from utils.mixins.sqlalchemy import TimestampMixin
+
 
 if TYPE_CHECKING:
     from models.roles import RoleORM
     from models.tasks import ProjectORM
 
-class StructureORM(Base):
+
+class StructureORM(Base, TimestampMixin):
     __tablename__ = "structures"
 
     head_id: Mapped[UUID|None] = mapped_column(ForeignKey("roles.id", ondelete="SET NULL"), nullable=True)

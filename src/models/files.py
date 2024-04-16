@@ -6,6 +6,8 @@ from uuid import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, func
 
+from utils.mixins.sqlalchemy import TimestampMixin
+
 if TYPE_CHECKING:
     from models.tasks import TaskORM
     from models.report import ReportORM
@@ -22,13 +24,11 @@ class FolderORM(Base):
     # enclosure: Mapped[Union["TaskORM","ReportORM"]] = relationship(back_populates="folder")
 
 
-class FileORM(Base):
+class FileORM(Base, TimestampMixin):
     __tablename__ = "files"
 
     data: Mapped[bytes|None]
     name: Mapped[str|None]   
     folder_id: Mapped[UUID|None] = mapped_column(ForeignKey("folders.id", ondelete="CASCADE"))
-    created_at: Mapped[datetime] = mapped_column(default=func.now())
-    changed_at: Mapped[datetime|None] = mapped_column(onupdate=func.now())
 
     folder: Mapped[Optional["FolderORM"]] = relationship(back_populates="files")

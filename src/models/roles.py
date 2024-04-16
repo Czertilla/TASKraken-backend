@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
 from models.report import ReportORM
-
+from utils.mixins.sqlalchemy import TimestampMixin
 
 
 if TYPE_CHECKING:
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from models.rights import RoleRightORM
 
 
-class RoleORM(Base):
+class RoleORM(Base, TimestampMixin):
     __tablename__ = "roles"
 
     user_id: Mapped[UUID|None] = mapped_column(ForeignKey("user.id", ondelete="SET NULL"))
