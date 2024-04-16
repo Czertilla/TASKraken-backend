@@ -13,12 +13,6 @@ if TYPE_CHECKING:
     from models import StructureORM, RoleORM, FolderORM
     from models.report import ReportORM
 
-class TaskStatus(Enum):
-    created = "created"
-    frozen = "frozen"
-    resumed = "resumed"
-    closed = "closed"
-    completed = "completed"
 
 class ProjectORM(TaskProjectMixin, Base):
     __tablename__ = "projects"
