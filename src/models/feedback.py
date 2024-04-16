@@ -4,18 +4,8 @@ from uuid import UUID
 from database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
+from utils.enums.feedback import Points
 
-if TYPE_CHECKING:
-    from models.report import ReportORM
-    from models.tasks import TaskORM
-
-class Points(Enum):
-    F = 0
-    E = 1
-    C = 2
-    B = 3
-    A = 4
-    S = 5
 
 class FeedbackORM():
     __tablename__ = "feedbacks"
