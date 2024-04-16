@@ -35,6 +35,8 @@ class SQLAlchemyRepository(AbstractRepository):
             await self.session.flush()
         return result
     
+    async def flush(self)-> None:
+        await self.session.flush()
 
     async def get(self, data_orm: model)-> model:
         return await self.session.get(self.model, data_orm.id)
