@@ -1,4 +1,5 @@
-from typing import Any
+from logging import getLogger
+from typing import Any, Type
 from uuid import uuid4, UUID
 from sqlalchemy.types import JSON, DateTime
 from datetime import datetime
@@ -6,7 +7,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from uuid import UUID
-from sqlalchemy import Result, insert, select
+from sqlalchemy import ReturnsRows, Result, insert, select
 from utils.absract.repository import AbstractRepository
  
 class IdMinxin:
@@ -24,12 +25,19 @@ class Base(DeclarativeBase, IdMinxin):
 
 class SQLAlchemyRepository(AbstractRepository):
     model = Base
+    logger = getLogger("SQL")
+
+    # def __new__(cls, *args, **kwargs):
+    #     if cls.logger is None:
+    #         cls.logger = getLogger(f"SQL.{cls.__name__}")
+    #     return super().__new__(cls)
 
     def __init__(self, session: AsyncSession) -> None:
         super().__init__()
         self.session = session
 
     async def execute(self, stmt, flush=False) -> Result:
+        self.logger.debug(stmt)
         result: Result = await self.session.execute(statement=stmt)
         if flush:
             await self.session.flush()
@@ -38,8 +46,8 @@ class SQLAlchemyRepository(AbstractRepository):
     async def flush(self)-> None:
         await self.session.flush()
 
-    async def get(self, data_orm: model)-> model:
-        return await self.session.get(self.model, data_orm.id)
+    async def get(self, id: UUID)-> model:
+        return await self.session.get(self.model, id)
 
 
     async def merge(self, data_orm: model, flush=False):
