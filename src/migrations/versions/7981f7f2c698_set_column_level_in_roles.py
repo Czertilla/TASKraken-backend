@@ -14,7 +14,7 @@ from models import RoleORM
 
 # revision identifiers, used by Alembic.
 revision: str = '7981f7f2c698'
-down_revision: Union[str, None] = 'f8a6c22c91e1'
+down_revision: Union[str, None] = '6db38c9dd78e'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

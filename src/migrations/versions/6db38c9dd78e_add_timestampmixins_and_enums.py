@@ -16,7 +16,7 @@ from models.structures import StructureORM
 
 # revision identifiers, used by Alembic.
 revision: str = '6db38c9dd78e'
-down_revision: Union[str, None] = '7981f7f2c698'
+down_revision: Union[str, None] = 'f8a6c22c91e1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
