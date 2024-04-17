@@ -21,3 +21,13 @@ class RejectRight(AEnum):
     nobody = False
 
     __default__ = same_level
+
+
+class RightsTemplateName(AEnum):
+    ordinary = "ordinary"
+    head = "head"
+    gendir = "gendir"
+    hr = "hr"
+    null = None
+
+    __default__ = ordinary

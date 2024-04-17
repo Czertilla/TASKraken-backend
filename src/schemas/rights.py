@@ -2,18 +2,7 @@ from typing import Annotated
 from fastapi import Query
 from pydantic import BaseModel
 from utils.enums.abstract import AEnum
-from utils.enums.rights import RejectRight, TaskSendVector
-
-
-class RightsTemplateName(AEnum):
-    
-    ordinary = "ordinary"
-    head = "head"
-    gendir = "gendir"
-    hr = "hr"
-    null = None
-
-    __default__ = ordinary
+from utils.enums.rights import RejectRight, RightsTemplateName, TaskSendVector
 
 
 class SRoleRights(BaseModel):
