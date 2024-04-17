@@ -9,7 +9,7 @@ from services.users import UserService
 
 verified_user = fastapi_users.current_user(verified=True, superuser=False) 
 
-users_router = APIRouter(prefix="/specs", tags=["specialists"])
+users_router = APIRouter(prefix="/user", tags=["user"])
 
 @users_router.get("/")
 async def get_some(
