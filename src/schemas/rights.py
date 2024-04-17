@@ -6,22 +6,23 @@ from utils.enums.rights import RejectRight, TaskSendVector
 
 
 class RightsTemplateName(AEnum):
+    
     ordinary = "ordinary"
     head = "head"
     gendir = "gendir"
     hr = "hr"
     null = None
 
-    default = ordinary
+    __default__ = ordinary
 
 
 class SRoleRights(BaseModel):
-    template: Annotated[RightsTemplateName, Query(default=RightsTemplateName.default)]
+    template: Annotated[RightsTemplateName, Query(default=RightsTemplateName.__default__)]
     can_create_substructures: Annotated[bool, Query(default=False)]
     can_create_subordinates: Annotated[bool, Query(default=False)]
-    can_send_task: Annotated[TaskSendVector, Query(default=TaskSendVector.default)]
+    can_send_task: Annotated[TaskSendVector, Query(default=TaskSendVector.__default__)]
     can_send_report: Annotated[bool, Query(default=True)]
-    can_reject_task: Annotated[RejectRight, Query(default=RejectRight.default)]
+    can_reject_task: Annotated[RejectRight, Query(default=RejectRight.__default__)]
 
     class Config:
         from_attributes = True

@@ -25,7 +25,7 @@ class TaskProjectMixin(TimestampMixin):
     
     @declared_attr
     def status(cls) -> Mapped[TaskStatus]:
-        return mapped_column(default=TaskStatus.default)
+        return mapped_column(default=TaskStatus.__default__)
     
     @declared_attr
     def status_timestamp(cls) -> Mapped[datetime]:

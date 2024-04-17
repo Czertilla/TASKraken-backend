@@ -9,4 +9,4 @@ class TaskStatus(AEnum):
     closed = "closed"
     completed = "completed"
 
-    default = created
+    __default__ = created

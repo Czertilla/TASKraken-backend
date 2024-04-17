@@ -11,7 +11,7 @@ class TaskSendVector(AEnum):
 
     ALL = "ALL"
 
-    default = direct
+    __default__ = direct
 
 class RejectRight(AEnum):
     same_level = "level"
@@ -20,4 +20,4 @@ class RejectRight(AEnum):
     everyone = "everyone"
     nobody = False
 
-    default = same_level
+    __default__ = same_level
