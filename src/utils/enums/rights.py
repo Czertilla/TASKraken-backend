@@ -18,5 +18,6 @@ class RejectRight(AEnum):
     undirect = "undirect"
     structure = "struct"
     everyone = "everyone"
+    nobody = False
 
     default = same_level
