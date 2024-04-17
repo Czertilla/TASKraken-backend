@@ -18,3 +18,13 @@ class RoleRepo(BaseRepo):
             (joinedload(self.model.structure),)
         )
     
+
+    async def get_for_page(self, id: UUID):
+        return await self.get_with_options(
+            id,
+            (
+                joinedload(self.model.structure),
+                selectinload(self.model.subordinates),
+                joinedload(self.model.rights)
+             )
+        )
