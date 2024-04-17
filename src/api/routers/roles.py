@@ -6,19 +6,20 @@ from api.auth.auth import fastapi_users
 from api.dependencies import RoleUOWDep
 from models.users import UserORM
 from schemas.rights import SRoleRights
+from schemas.roles import SGetRolePageRequest, SRoleInfo, SRolePage
 from services.roles import RoleService
 
 get_verified = fastapi_users.current_user(verified=True, active=True)
 
 roles = APIRouter(prefix="/role", tags=["roles"])
 
-@roles.get("/{role_id}")
+@roles.get("/{target_id}")
 async def get_role_page(
     user: Annotated[UserORM, Depends(get_verified)],
     uow: RoleUOWDep,
-    role_id: UUID
-) -> SRoleInfo | SRolePage: # type: ignore
-    return await RoleService(uow).get_role_page(user, role_id)
+    request: Annotated[SGetRolePageRequest, Depends()]
+) -> SRoleInfo | SRolePage:
+    return await RoleService(uow).get_role_page(user, request)
 
 
 @roles.get("/{role_id}/check")
