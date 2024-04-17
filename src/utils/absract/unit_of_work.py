@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Type
 
 from repositories.files import FileRepo
+from repositories.rights import RightRepo
 from repositories.roles import RoleRepo
 from repositories.structures import StructureRepo
 from repositories.users import UserRepo
@@ -11,6 +12,7 @@ class ABCUnitOfWork(ABC):
     files: Type[FileRepo]
     users: Type[UserRepo]
     roles: Type[RoleRepo]
+    rights: Type[RightRepo]
     structs: Type[StructureRepo]
 
     @abstractmethod
