@@ -32,9 +32,11 @@ class SQLAlchemyRepository(AbstractRepository):
     #         cls.logger = getLogger(f"SQL.{cls.__name__}")
     #     return super().__new__(cls)
 
+
     def __init__(self, session: AsyncSession) -> None:
         super().__init__()
         self.session = session
+
 
     async def execute(self, stmt, flush=False) -> Result:
         self.logger.debug(stmt)
@@ -43,11 +45,22 @@ class SQLAlchemyRepository(AbstractRepository):
             await self.session.flush()
         return result
     
+
     async def flush(self)-> None:
         await self.session.flush()
 
+
     async def get(self, id: UUID)-> model:
         return await self.session.get(self.model, id)
+
+
+    async def get_with_options(self, id: UUID, options: tuple) -> model|None:
+        stmt = (
+            select(self.model)
+            .where(self.model.id==id)
+            .options(*options)
+        )
+        return (await self.session.execute(stmt)).scalar_one_or_none()
 
 
     async def merge(self, data_orm: model, flush=False):
@@ -65,7 +78,7 @@ class SQLAlchemyRepository(AbstractRepository):
         return (await self.execute(stmt, flush=False)).scalar_one()
     
 
-    async def find_by_id(self, id: UUID) -> model:
+    async def find_by_id(self, id: UUID) -> model|None:
         stmt = (
             select(self.model).
             where(self.model.id == id)
