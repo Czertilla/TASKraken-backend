@@ -21,6 +21,7 @@ class RoleRightORM(Base, TimestampMixin):
     can_create_subordinates: Mapped[bool] = mapped_column(default=False)
     can_send_task: Mapped[TaskSendVector] = mapped_column(default=TaskSendVector.default)
     can_send_report: Mapped[bool] = mapped_column(default=True)
-    can_reject_task: Mapped[RejectRight]
+    can_reject_task: Mapped[RejectRight] = mapped_column(default=RejectRight.default)
+
 
     role: Mapped["RoleORM"] = relationship(back_populates="rights")
