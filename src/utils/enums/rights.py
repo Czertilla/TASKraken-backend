@@ -7,9 +7,9 @@ class TaskSendVector(AEnum):
     direct = "direct"
     structure = "struct"
     organization = "org"
+    nobody = False
 
     ALL = "ALL"
-    nobody = False
 
     default = direct
 
