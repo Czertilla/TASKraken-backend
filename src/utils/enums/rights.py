@@ -2,6 +2,27 @@
 from utils.enums.abstract import AEnum
 
 
+class CreateStructRight(AEnum):
+    in_organization = "org"
+    in_overstruct = "overstruct"
+    in_struct = "struct"
+    nowhere = False
+
+    __default__ = nowhere
+
+
+class CreateVacancyRigth(AEnum):
+    organization = "org"
+    in_overstructure = "ovestruct"
+    lower_level = "level"
+    in_structure = "struct"
+    downstream = "downstream"
+    subordinates = "subord"
+    nobody = False
+
+    __default__ = nobody
+
+
 class TaskSendVector(AEnum):
     everyone = "everyone"
     direct = "direct"
@@ -12,6 +33,18 @@ class TaskSendVector(AEnum):
     ALL = "ALL"
 
     __default__ = direct
+
+
+class PetitionSendVector(AEnum):    
+    everyone = "everyone"
+    organization = "org"
+    upstream = "upstream"
+    structure = "struct"
+    direct = "direct"
+    nobody = False
+
+    __default__ = upstream
+
 
 class RejectRight(AEnum):
     same_level = "level"
