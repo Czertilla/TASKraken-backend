@@ -1,7 +1,9 @@
 from .users import users_router
 from .structures import structs_router
+from .roles import roles as roles_router
 routers = (
     structs_router,
+    roles_router,
     users_router
 )
 
