@@ -26,6 +26,7 @@ class RoleRightORM(Base, TimestampMixin):
     can_send_report: Mapped[bool] = mapped_column(default=True)
     can_send_petition: Mapped[SendPetitionVector] = mapped_column(default=SendPetitionVector.__default__)
     can_reject_task: Mapped[RejectTaskRight] = mapped_column(default=RejectTaskRight.__default__)
+#TODO add column 'can_view_roles' with type 'ViewRoleRight'
     can_edit_other_rights: Mapped[EditOtherRight] = mapped_column(default=EditOtherRight.__default__)
     can_edit_oneself_rights: Mapped[bool] = mapped_column(default=False)
 
