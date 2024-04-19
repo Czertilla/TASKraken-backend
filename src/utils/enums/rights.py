@@ -72,3 +72,5 @@ class EditOtherRight(AEnum):
     nobody = False
 
     __default__ = nobody
+
+#TODO add 'ViewRoleRight' AEnum class
