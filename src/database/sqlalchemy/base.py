@@ -60,7 +60,7 @@ class SQLAlchemyRepository(AbstractRepository):
             .where(self.model.id==id)
             .options(*options)
         )
-        return (await self.session.execute(stmt)).scalar_one_or_none()
+        return (await self.execute(stmt)).scalar_one_or_none()
 
 
     async def merge(self, data_orm: model, flush=False):
