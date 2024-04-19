@@ -17,7 +17,7 @@ class SCreateVacancy(BaseModel):
 
 
 class SRoleCheckResponce(BaseModel):
-    status = Annotated[CheckRoleStatus, Field()]
+    status: Annotated[CheckRoleStatus, Field(default=CheckRoleStatus.__default__)]
 
     class Config:
         from_atributes = True
