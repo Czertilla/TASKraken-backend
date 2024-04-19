@@ -25,32 +25,31 @@ class CreateVacancyRigth(AEnum):
 
 class TaskSendVector(AEnum):
     everyone = "everyone"
-    direct = "direct"
-    structure = "struct"
     organization = "org"
+    structure = "struct"
+    downstream = "downstream"
+    direct_down = "direct"
     nobody = False
 
-    ALL = "ALL"
-
-    __default__ = direct
+    __default__ = direct_down
 
 
-class PetitionSendVector(AEnum):    
+class PetitionSendVector(AEnum):
     everyone = "everyone"
     organization = "org"
     upstream = "upstream"
     structure = "struct"
-    direct = "direct"
+    direct_up = "direct"
     nobody = False
 
     __default__ = upstream
 
 
 class RejectRight(AEnum):
-    same_level = "level"
-    undirect = "undirect"
-    structure = "struct"
     everyone = "everyone"
+    structure = "struct"
+    undirect = "undirect"
+    same_level = "level"
     nobody = False
 
     __default__ = same_level
@@ -64,3 +63,13 @@ class RightsTemplateName(AEnum):
     null = None
 
     __default__ = ordinary
+
+
+class EditOtherRight(AEnum):
+    organization = "org"
+    structure = "struct"
+    direct = "direct"
+    nobody = False
+
+    __default__ = nobody
+
