@@ -1,6 +1,7 @@
 
 from datetime import datetime
 from typing import Annotated
+from uuid import UUID
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 
@@ -15,3 +16,8 @@ class SRegistOrganization(BaseModel):
 
     class Config:
         from_atributes = True
+
+
+class SRegistOrgResponse(BaseModel):
+    gen_dir_id: Annotated[UUID, Field()]
+    org_id: Annotated[UUID, Field()]
