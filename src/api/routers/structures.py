@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from api.auth.auth import fastapi_users
 from api.dependencies import StructUOWDep
 from models.users import UserORM
-from schemas.structures import SRegistOrganization
+from schemas.structures import SRegistOrganization, SRegistOrgResponse
 from services.structures import StructureService
 
 
@@ -19,5 +19,5 @@ async def regist_organization(
     user: Annotated[UserORM, Depends(get_verified_user)],
     uow: StructUOWDep,
     organization_blank: SRegistOrganization = Depends()
-):
-    await StructureService(uow).regist_organization(user, organization_blank)
+)-> SRegistOrgResponse:
+    return await StructureService(uow).regist_organization(user, organization_blank)
