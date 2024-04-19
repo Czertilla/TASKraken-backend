@@ -6,7 +6,7 @@ from sqlalchemy import ForeignKey
 
 from database import Base
 from utils.enums import SendTaskVector, RejectTaskRight
-from utils.enums.rights import EditOtherRight, SendPetitionVector
+from utils.enums.rights import CreateStructRight, CreateVacancyRigth, EditOtherRight, SendPetitionVector
 from utils.mixins.sqlalchemy import TimestampMixin
 
 
@@ -18,8 +18,9 @@ class RoleRightORM(Base, TimestampMixin):
     __tablename__ = "rights"
 
     role_id: Mapped[UUID] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"))
-    can_create_substructures: Mapped[bool] = mapped_column(default=False)
-    can_create_subordinates: Mapped[bool] = mapped_column(default=False)
+    template_id: Mapped[UUID|None] = mapped_column(ForeignKey("rights.id", ondelete="SET NULL"), nullable=True)
+    can_create_substructures: Mapped[CreateStructRight] = mapped_column(default=CreateStructRight.__default__)
+    can_create_subordinates: Mapped[CreateVacancyRigth] = mapped_column(default=CreateVacancyRigth.__default__)
     can_create_project: Mapped[bool] = mapped_column(default=False)
     can_send_task: Mapped[SendTaskVector] = mapped_column(default=SendTaskVector.__default__)
     can_send_report: Mapped[bool] = mapped_column(default=True)
