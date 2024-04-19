@@ -1,6 +1,6 @@
 from .feedback import Points
 from .rights import (
-    TaskSendVector,
-    RejectRight
+    SendTaskVector,
+    RejectTaskRight
 )
 from .task import TaskStatus
