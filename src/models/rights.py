@@ -1,10 +1,10 @@
 from typing import TYPE_CHECKING
 from uuid import UUID
-from database import Base
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
-from utils.enums.abstract import AEnum
+from database import Base
 from utils.enums import TaskSendVector, RejectRight
 from utils.mixins.sqlalchemy import TimestampMixin
 

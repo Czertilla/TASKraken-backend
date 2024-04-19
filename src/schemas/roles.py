@@ -4,7 +4,6 @@ from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 
 from schemas.rights import SRoleRights
-from utils.enums import RejectRight, TaskSendVector
 from utils.enums.roles import CheckRoleStatus, ViewMode
 
 
