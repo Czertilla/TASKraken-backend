@@ -8,3 +8,4 @@ from .roles import RoleORM
 from .structures import StructureORM
 from .tasks import ProjectORM, TaskORM
 from .users import UserORM
+from .rights import RoleRightORM
