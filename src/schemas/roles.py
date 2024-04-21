@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 
-from schemas.rights import SRoleRights
+from schemas.rights import SHeadRights, SRoleRights
 from utils.enums.roles import CheckRoleStatus, ViewMode
 
 
