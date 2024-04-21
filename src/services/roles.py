@@ -120,8 +120,8 @@ class RoleService(BaseService):
             case EditOtherRight.organization:
                 return (
                     target_role.structure.org_id ==
-                    editor_role.structure.org_id 
-                )
+                    editor_role.structure.org_id
+                ) if target_role.chief_id is not None else False
             case EditOtherRight.structure:
                 return (
                     target_role.structure_id ==
