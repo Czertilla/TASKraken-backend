@@ -46,6 +46,16 @@ class RoleRepo(BaseRepo):
         )
     
 
+    async def get_for_rights_check(self, id: UUID):
+        return await self.get_with_options(
+            id, 
+            (
+                joinedload(self.model.rights),
+                joinedload(self.model.structure)
+            )
+        )
+    
+
     async def is_on_downstream(
         self, 
         first_id: UUID, 
