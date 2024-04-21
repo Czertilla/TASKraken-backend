@@ -3,15 +3,20 @@ from typing import Type
 from uuid import UUID
 from models.rights import RoleRightORM
 from models.roles import RoleORM
+from models.structures import StructureORM
 from models.users import UserORM
 from schemas.rights import RightsTemplateName, SRoleRights
 from schemas.roles import (
     SCreateRoleResponse,
     SCreateStructHead, 
     SCreateSubordinate, 
-    SGetRolePageRequest, SRoleCheckResponce, SRoleInfo, SRolePage
+    SGetRolePageRequest, 
+    SRoleCheckResponce, 
+    SRoleInfo, 
+    SRolePage
+)
 from utils.absract.service import BaseService
-from utils.enums.rights import EditOtherRight
+from utils.enums.rights import CreateVacancyRigth, EditOtherRight
 from utils.enums.roles import CheckRoleStatus, ViewMode
 
 
@@ -130,6 +135,45 @@ class RoleService(BaseService):
             case _:
                 return False
             
+    
+    async def can_create_roles(
+        self,
+        creator_role: RoleORM,
+        chief_role: RoleORM
+    ) -> bool:
+        async with self.uow:
+            match creator_role.rights.can_create_subordinates:
+                case CreateVacancyRigth.organization:
+                    return(
+                        creator_role.structure.org_id ==
+                        chief_role.structure.org_id
+                    )
+                case CreateVacancyRigth.in_overstructure:
+#TODO change to realization for overstruct
+                    return(
+                        creator_role.structure.org_id ==
+                        chief_role.structure.org_id
+                    )
+                case CreateVacancyRigth.lower_level:
+                    return(
+                        creator_role.level >=
+                        chief_role.level
+                    )
+                case CreateVacancyRigth.subordinates:
+                    return(
+                        creator_role.id == chief_role.id
+                    )
+                case CreateVacancyRigth.downstream:
+                    if creator_role.level < chief_role:
+                        return False
+#TODO need test is_on_downstrem
+                    return await self.uow.roles.is_on_downstream(
+                        creator_role.id,
+                        chief_role.id,
+                    ) if creator_role.id != chief_role.id else True
+                case _:
+                    return False
+
     
     async def get_role_rights(
         self,
