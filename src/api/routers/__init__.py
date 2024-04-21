@@ -14,4 +14,3 @@ def include_routers(app: FastAPI) -> None:
     for router in routers:
         app.include_router(router)
     include_auth_routers(app)
-
