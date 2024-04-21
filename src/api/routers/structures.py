@@ -1,11 +1,13 @@
 from typing import Annotated
 from uuid import UUID
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from api.auth.auth import fastapi_users
 from api.dependencies import StructUOWDep
 from models.users import UserORM
-from schemas.structures import SCreateStruct, SRegistOrganization, SRegistOrgResponse
+from schemas.structures import SCreateStruct, SCreateStructResponse, SRegistOrganization, SRegistOrgResponse
+from services.roles import RoleService
 from services.structures import StructureService
+from utils.enums.roles import CheckRoleStatus
 
 
 get_verified = fastapi_users.current_user(verified=True, active=True) 
@@ -30,5 +32,11 @@ async def create_substruct(
     uow: StructUOWDep,
     role_id: UUID,
     request: SCreateStruct = Depends()
-)-> SRegistOrgResponse:
-    ...
+)-> SCreateStructResponse:
+    if (status:=await RoleService(uow).check_role(user, role_id)) != CheckRoleStatus.belong:
+        raise HTTPException(status_code=403, detail=status)
+    response = await StructureService(uow).create_substruct(role_id, request)
+    if response.reject_message is not None:
+        raise HTTPException(status_code=403, detail=response.reject_message)
+    return response
+    
