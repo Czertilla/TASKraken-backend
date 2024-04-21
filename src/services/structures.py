@@ -4,8 +4,9 @@ from models.roles import RoleORM
 from models.structures import StructureORM
 from models.users import UserORM
 from schemas.roles import SRoleRights
-from schemas.structures import SRegistOrgResponse, SRegistOrganization
+from schemas.structures import SCreateStruct, SCreateStructResponse, SRegistOrgResponse, SRegistOrganization
 from utils.absract.service import BaseService
+from utils.enums.rights import CreateStructRight
 
 logger = getLogger(__name__)
 
@@ -37,4 +38,46 @@ class StructureService(BaseService):
             gen_dir_id=head_id,
             org_id=structure_id
         )
+    
 
+    async def can_create_structs(
+        self, 
+        role: RoleORM,
+        enclosure: StructureORM
+    )-> bool:
+        match role.rights.can_create_substructures:
+            case CreateStructRight.in_organization:
+                return (
+                    role.structure.org_id ==
+                    enclosure.org_id
+                )
+            case CreateStructRight.in_overstruct:
+#TODO realize
+                return (
+                    False
+                )
+            case CreateStructRight.in_struct:
+                return (
+                    role.structure_id ==
+                    enclosure.id
+                )
+            case _:
+                return False
+
+    async def create_substruct(self, role_id: UUID, data: SCreateStruct) -> SCreateStructResponse:
+        async with self.uow:
+            role: RoleORM = await self.uow.roles.get_for_rights_check(role_id)
+            if role is None:
+                return SCreateStructResponse(reject_message="role unexist")
+            enclosure: StructureORM = await self.uow.structs.get(data.enclosure_id)
+            if enclosure is None:
+                return SCreateStructResponse(reject_message="enclosure unexist")
+            await self.uow.commit(flush=True)
+        if not await self.can_create_structs(role, enclosure):
+            return SCreateStructResponse(reject_message="creating forbidden")
+        data: dict = data.model_dump()
+        async with self.uow:
+            struct_id: UUID = await self.uow.structs.add_one(data)
+            await self.uow.commit()
+            data.update({"id": struct_id})
+        return SCreateStructResponse(**data)
