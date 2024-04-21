@@ -61,6 +61,13 @@ class RoleService(BaseService):
                         role_id=struct_id,
                         request_key="struct_id"
                     )
+                if struct.head_id is not None:
+                    return SRoleCheckResponce(
+                        status=CheckRoleStatus.error,
+                        role_id=struct_id,
+                        request_key="struct_id",
+                        comment=f"struct head already exist: {struct.head_id}"
+                    )
                 if struct.enclosure_id != chief_role.structure_id:
                     return SRoleCheckResponce(
                         status=CheckRoleStatus.unbelonged,
