@@ -202,9 +202,12 @@ class RoleService(BaseService):
                     rights.__dict__.items()
                 ))
             return SRoleRights(**data)
-        return SRoleCheckResponce(status=target_status)
+        return SRoleCheckResponce(
+            status=target_status,
+            request_key="target_id",
+            role_id=request.target_id
+        )
             
-
 
     async def get_role_page(
         self, 
@@ -213,7 +216,11 @@ class RoleService(BaseService):
     ) -> SRoleInfo | SRolePage | SRoleCheckResponce:
         status = await self.check_role(user, request.target_id)
         if status == CheckRoleStatus.unexist:
-            return SRoleCheckResponce(status=status)
+            return SRoleCheckResponce(
+                status=status.value,
+                request_key="target_id",
+                role_id=request.target_id
+            )
         async with self.uow:
             data = {}
             view_mode = ViewMode.owner
