@@ -6,7 +6,7 @@ class CreateStructRight(AEnum):
     in_organization = "org"
     in_overstruct = "overstruct"
     in_struct = "struct"
-    nowhere: bool = "false"
+    nowhere = "false"
 
     __default__ = nowhere
 
