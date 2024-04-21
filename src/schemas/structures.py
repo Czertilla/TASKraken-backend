@@ -26,3 +26,8 @@ class SRegistOrganization(SCreateStruct):
 class SRegistOrgResponse(BaseModel):
     gen_dir_id: Annotated[UUID, Field()]
     org_id: Annotated[UUID, Field()]
+
+
+class SCreateStructResponse(SCreateStruct):
+    struct_id: UUID | None = None
+    reject_message: str = None
