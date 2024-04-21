@@ -11,14 +11,22 @@ class SCreateSubordinate(BaseModel):
     name: Annotated[str, Query(max_length=64)]
     rights: Annotated[SRoleRights, Query(title='Vacancy rights')] = Depends()
     chief_id: UUID
-    level: Annotated[int, Query(ge=0)]
 
     class Config:
         from_atributes = True
 
 
+class SCreateStructHead(SCreateSubordinate):
+    rights: Annotated[SHeadRights, Query(title='Vacancy rights')] = Depends()
+    structure_id: UUID
+
+
 class SRoleCheckResponce(BaseModel):
+    request_key: str = None
+    role_id: UUID = None
     status: Annotated[CheckRoleStatus, Field(default=CheckRoleStatus.__default__)]
+    comment: str = None
+
 
     class Config:
         from_atributes = True
@@ -49,3 +57,10 @@ class SRolePage(SRoleInfo):
     rights: Annotated[SRoleRights, Field()]
 
 
+class SCreateRoleResponse(BaseModel):
+    id: UUID
+    name: str
+    chief_id: UUID
+    structure_id: UUID
+    level: int
+    rights: Annotated[SRoleRights, Field()]
