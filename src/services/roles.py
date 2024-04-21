@@ -100,6 +100,8 @@ class RoleService(BaseService):
 
 
     async def check_role(self, user: UserORM, role_id: UUID) -> CheckRoleStatus:
+        if type(user) != UserORM:
+            return CheckRoleStatus.unbelonged
         async with self.uow:
             role = await self.uow.roles.get(role_id)
             if type(role) != RoleORM:
@@ -211,7 +213,7 @@ class RoleService(BaseService):
 
     async def get_role_page(
         self, 
-        user: UserORM, 
+        user: UserORM|None, 
         request: SGetRolePageRequest
     ) -> SRoleInfo | SRolePage | SRoleCheckResponce:
         status = await self.check_role(user, request.target_id)
@@ -224,12 +226,12 @@ class RoleService(BaseService):
         async with self.uow:
             data = {}
             view_mode = ViewMode.owner
-            if status == CheckRoleStatus.unbelonged: 
+            if status == CheckRoleStatus.unbelonged or user is None: 
                 view_mode = ViewMode.info
                 role: RoleORM = await self.uow.roles.get_for_info(request.target_id)
-                if request.role_id is not None:
+                if request.role_id is not None and user is not None:
                     status = await self.check_role(user, request.role_id)
-                    if status == CheckRoleStatus.belong:
+                    if status == CheckRoleStatus.belong and user.is_verified:
                         watcher: RoleORM = await self.uow.roles.get_for_page(request.role_id)
                         if role.structure.org_id == watcher.structure.org_id:
                             if self.can_edit_rights(role, watcher):

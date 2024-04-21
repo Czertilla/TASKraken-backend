@@ -10,12 +10,13 @@ from schemas.roles import SCreateRoleResponse, SCreateSubordinate, SGetRolePageR
 from services.roles import RoleService
 
 get_verified = fastapi_users.current_user(verified=True, active=True)
+get_optional = fastapi_users.current_user(optional=True)
 
 roles = APIRouter(prefix="/role", tags=["roles"])
 
 @roles.get("/{target_id}")
 async def get_role_page(
-    user: Annotated[UserORM, Depends(get_verified)],
+    user: Annotated[UserORM, Depends(get_optional)],
     uow: RoleUOWDep,
     request: Annotated[SGetRolePageRequest, Depends()]
 ) -> SRoleInfo | SRolePage | SRoleCheckResponce:
