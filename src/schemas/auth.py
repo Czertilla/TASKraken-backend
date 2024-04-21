@@ -10,7 +10,6 @@ from repositories.users import UserRepo
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     username: str
-    role: str
     class Config:
         from_atributes = True
 
