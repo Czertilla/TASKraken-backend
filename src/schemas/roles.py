@@ -7,7 +7,7 @@ from schemas.rights import SRoleRights
 from utils.enums.roles import CheckRoleStatus, ViewMode
 
 
-class SCreateVacancy(BaseModel):
+class SCreateSubordinate(BaseModel):
     name: Annotated[str, Query(max_length=64)]
     rights: Annotated[SRoleRights, Query(title='Vacancy rights')] = Depends()
     chief_id: UUID
