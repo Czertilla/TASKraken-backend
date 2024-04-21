@@ -6,6 +6,7 @@ class CheckRoleStatus(AEnum):
     unexist = "unexists"
     unbelonged = "unbelongs"
     belong = "belongs"
+    forbidden = "forbidden"
     error = "err"
 
     __default__ = unexist
