@@ -54,7 +54,7 @@ class RoleService(BaseService):
                 )
             level = chief_role.level + 1
             if type(data) == SCreateStructHead:
-                struct: StructureORM = self.uow.structs.get(struct_id:=data.structure_id)
+                struct: StructureORM = await self.uow.structs.get(struct_id:=data.structure_id)
                 if struct is None:
                     return SRoleCheckResponce(
                         status=CheckRoleStatus.unexist,
@@ -122,7 +122,7 @@ class RoleService(BaseService):
 
     def can_edit_rights(
         self, 
-        target_role: RoleORM, 
+        target_role: RoleORM,
         editor_role: RoleORM
     ) -> bool:
         match editor_role.rights.can_edit_other_rights:
