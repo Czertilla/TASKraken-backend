@@ -6,7 +6,7 @@ class CreateStructRight(AEnum):
     in_organization = "org"
     in_overstruct = "overstruct"
     in_struct = "struct"
-    nowhere = False
+    nowhere: bool = "false"
 
     __default__ = nowhere
 
@@ -18,7 +18,7 @@ class CreateVacancyRigth(AEnum):
     in_structure = "struct"
     downstream = "downstream"
     subordinates = "subord"
-    nobody = False
+    nobody = "false"
 
     __default__ = nobody
 
@@ -29,7 +29,7 @@ class SendTaskVector(AEnum):
     structure = "struct"
     downstream = "downstream"
     direct_down = "direct"
-    nobody = False
+    nobody: bool = "false"
 
     __default__ = direct_down
 
@@ -40,7 +40,7 @@ class SendPetitionVector(AEnum):
     upstream = "upstream"
     structure = "struct"
     direct_up = "direct"
-    nobody = False
+    nobody: bool = "false"
 
     __default__ = upstream
 
@@ -50,7 +50,7 @@ class RejectTaskRight(AEnum):
     structure = "struct"
     undirect = "undirect"
     same_level = "level"
-    nobody = False
+    nobody: bool = "false"
 
     __default__ = same_level
 
@@ -60,7 +60,7 @@ class RightsTemplateName(AEnum):
     head = "head"
     gendir = "gendir"
     hr = "hr"
-    null = None
+    null = "null"
 
     __default__ = ordinary
 
@@ -69,7 +69,7 @@ class EditOtherRight(AEnum):
     organization = "org"
     structure = "struct"
     direct = "direct"
-    nobody = False
+    nobody: bool = "false"
 
     __default__ = nobody
 
