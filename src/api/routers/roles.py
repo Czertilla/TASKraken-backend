@@ -3,10 +3,10 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 
 from api.auth.auth import fastapi_users
-from api.dependencies import RoleUOWDep
+from api.dependencies import RoleUOWDep, StructUOWDep
 from models.users import UserORM
 from schemas.rights import SRoleRights
-from schemas.roles import SCreateRoleResponse, SCreateSubordinate, SGetRolePageRequest, SRoleCheckResponce, SRoleInfo, SRolePage
+from schemas.roles import SCreateRoleResponse, SCreateStructHead, SCreateSubordinate, SGetRolePageRequest, SRoleCheckResponce, SRoleInfo, SRolePage
 from services.roles import RoleService
 
 get_verified = fastapi_users.current_user(verified=True, active=True)
@@ -47,5 +47,15 @@ async def create_subordinate(
     uow: RoleUOWDep,
     role_id: UUID,
     request: SCreateSubordinate = Depends()
+) -> SCreateRoleResponse | SRoleCheckResponce:
+    return await RoleService(uow).create_subordinate(user, role_id, request)
+
+
+@roles.post("create_struct_head")
+async def create_struct_head(
+    user: Annotated[UserORM, Depends(get_verified)],
+    uow: StructUOWDep,
+    role_id: UUID,
+    request: SCreateStructHead = Depends()
 ) -> SCreateRoleResponse | SRoleCheckResponce:
     return await RoleService(uow).create_subordinate(user, role_id, request)
