@@ -29,5 +29,5 @@ class SRegistOrgResponse(BaseModel):
 
 
 class SCreateStructResponse(SCreateStruct):
-    struct_id: UUID | None = None
+    id: UUID | None = None
     reject_message: str = None
