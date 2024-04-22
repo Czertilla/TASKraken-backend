@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     DB_DBMS: str = "sqlite"
     USERS_SECTRET: str
     PASSW_SECTRET: str
-    K: int = 1
+    MAX_PAGE_SIZE: int = 100
 
     model_config = SettingsConfigDict(env_file=environ, extra="ignore")
 
