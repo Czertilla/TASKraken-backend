@@ -28,7 +28,6 @@ class StructureService(BaseService):
             })
             head_id = await self.uow.roles.add_one(gen_dir_data)
             org.head_id = head_id
-            org.org_id = org.id
             await self.uow.rights.add_one({
                 "role_id": head_id,
                 **rights_data
@@ -40,7 +39,7 @@ class StructureService(BaseService):
         )
     
 
-    async def can_create_structs(
+    def can_create_structs(
         self, 
         role: RoleORM,
         enclosure: StructureORM
@@ -73,10 +72,15 @@ class StructureService(BaseService):
             if enclosure is None:
                 return SCreateStructResponse(reject_message="enclosure unexist")
             await self.uow.commit(flush=True)
-        if not await self.can_create_structs(role, enclosure):
-            return SCreateStructResponse(reject_message="creating forbidden")
-        data: dict = data.model_dump()
-        async with self.uow:
+            if not self.can_create_structs(role, enclosure):
+                return SCreateStructResponse(reject_message="creating forbidden")
+            data: dict = data.model_dump()
+            data.update({
+                "org_id": 
+                    enclosure.id
+                    if enclosure.org_id is None and enclosure.enclosure_id is None 
+                    else enclosure.org_id
+            })
             struct_id: UUID = await self.uow.structs.add_one(data)
             await self.uow.commit()
             data.update({"id": struct_id})
