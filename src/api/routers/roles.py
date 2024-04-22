@@ -51,7 +51,7 @@ async def create_subordinate(
     return await RoleService(uow).create_subordinate(user, role_id, request)
 
 
-@roles.post("create_struct_head")
+@roles.post("/create_struct_head")
 async def create_struct_head(
     user: Annotated[UserORM, Depends(get_verified)],
     uow: StructUOWDep,
