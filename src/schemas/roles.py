@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 
+from schemas.pagination import SPaginationResponse
 from schemas.rights import SHeadRights, SRoleRights
 from utils.enums.roles import CheckRoleStatus, ViewMode
 
@@ -64,3 +65,14 @@ class SCreateRoleResponse(BaseModel):
     structure_id: UUID
     level: int
     rights: Annotated[SRoleRights, Field()]
+
+
+class SRolePreview(BaseModel):
+    id: UUID
+    name: Annotated[str, Field(max_length=64)]
+    organization_name: str|None
+
+
+class SRoleSearchResponse(BaseModel):
+    result: Annotated[list[SRolePreview], Field()]
+    pagination: Annotated[SPaginationResponse, Field()] = None
