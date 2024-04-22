@@ -1,10 +1,12 @@
 from logging import getLogger
 from typing import Type
 from uuid import UUID
+from filters.roles import RoleFilter
 from models.rights import RoleRightORM
 from models.roles import RoleORM
 from models.structures import StructureORM
 from models.users import UserORM
+from schemas.pagination import SPaginationRequest, SPaginationResponse
 from schemas.rights import RightsTemplateName, SRoleRights
 from schemas.roles import (
     SCreateRoleResponse,
@@ -13,7 +15,9 @@ from schemas.roles import (
     SGetRolePageRequest, 
     SRoleCheckResponce, 
     SRoleInfo, 
-    SRolePage
+    SRolePage,
+    SRolePreview,
+    SRoleSearchResponse
 )
 from utils.absract.service import BaseService
 from utils.enums.rights import CreateVacancyRigth, EditOtherRight
@@ -24,6 +28,33 @@ logger = getLogger(__name__)
 
 
 class RoleService(BaseService):
+    async def search(
+        self, 
+        filters: RoleFilter,
+        pagination: SPaginationRequest = SPaginationRequest()
+    ) -> SRoleSearchResponse:
+        offset = self.get_offset(pagination)
+        async with self.uow:
+            result: list[RoleORM] = (await self.uow.roles.search(filters, offset))
+            return SRoleSearchResponse(
+                result=[
+                    SRolePreview(
+                        id=role.id,
+                        name=role.name,
+                        organization_name= (
+                            lambda r: (
+                                r.structure.name
+                                if r.structure.enclosure_id is None
+                                else r.structure.org.name
+                            )
+                        )(role)
+                    )
+                    for role
+                    in result
+                ]
+            )
+
+
     async def create_subordinate(
         self, 
         user: UserORM, 
