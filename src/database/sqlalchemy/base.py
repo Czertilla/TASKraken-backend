@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 from uuid import UUID
 from sqlalchemy import ReturnsRows, Result, insert, select
 from utils.absract.repository import AbstractRepository
+from fastapi_filter.contrib.sqlalchemy import Filter
  
 class IdMinxin:
     @declared_attr
@@ -86,7 +87,13 @@ class SQLAlchemyRepository(AbstractRepository):
         return (await self.execute(stmt)).scalar_one_or_none()
 
 
-    async def search(self, **filters) -> list[model]:
+    async def search(self, filters: Filter, options: tuple, offset: tuple = (None, None)) -> list[model]:
+        stmt = filters.filter(select(self.model).options(*options))
+        offset += (None, None)
+        return (await self.execute(stmt)).scalars().all()[offset[0]:offset[1]]
+
+
+    async def find_all(self, **filters) -> list[model]:
         stmt = select(self.model).filter_by(**filters)
         result = await self.execute(stmt)
         result = result.scalars().all()

@@ -1,5 +1,6 @@
 from typing import Type
 from uuid import UUID
+from fastapi_filter.contrib.sqlalchemy import Filter
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload, joinedload
 from database import BaseRepo
@@ -14,14 +15,26 @@ logger = getLogger(__name__)
 class RoleRepo(BaseRepo):
     model = RoleORM
 
+    class JoinConst:
+        struct_with_org = (
+            joinedload(RoleORM.structure)
+            .joinedload(StructureORM.org),
+        )
+
+    async def search(self, filters, offset: tuple = (None, None)) -> list[model]:
+        return await super().search(
+            filters, 
+            options=(
+                self.JoinConst.struct_with_org
+            ),
+            offset=offset
+        )
+
 
     async def get_for_info(self, id: UUID):
         return await self.get_with_options(
             id, 
-            (
-                joinedload(self.model.structure)
-                .joinedload(StructureORM.org),
-            )
+            self.JoinConst.struct_with_org
         )
     
 
@@ -29,8 +42,7 @@ class RoleRepo(BaseRepo):
         return await self.get_with_options(
             id,
             (
-                joinedload(self.model.structure)
-                .joinedload(StructureORM.org),
+                *self.JoinConst.struct_with_org,
                 selectinload(self.model.subordinates),
                 joinedload(self.model.rights)
              )
