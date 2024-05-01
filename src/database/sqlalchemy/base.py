@@ -61,7 +61,7 @@ class SQLAlchemyRepository(AbstractRepository):
             .where(self.model.id==id)
             .options(*options)
         )
-        return (await self.execute(stmt)).scalar_one_or_none()
+        return (await self.execute(stmt)).unique().scalar_one_or_none()
 
 
     async def merge(self, data_orm: model, flush=False):
@@ -75,6 +75,16 @@ class SQLAlchemyRepository(AbstractRepository):
             insert(self.model).
             values(**data).
             returning(self.model.id)
+        )
+        return (await self.execute(stmt, flush=False)).scalar_one()
+    
+
+    async def add_n_return(self, data: dict, options = tuple()) -> model:
+        stmt = (
+            insert(self.model)
+            .values(**data)
+            .returning(self.model)
+            .options(*options)
         )
         return (await self.execute(stmt, flush=False)).scalar_one()
     
