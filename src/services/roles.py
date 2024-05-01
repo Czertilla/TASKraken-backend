@@ -1,7 +1,9 @@
 from logging import getLogger
-from typing import Type
 from uuid import UUID
-from filters.roles import RoleFilter
+
+from fastapi import HTTPException
+from fastapi.responses import JSONResponse
+from schemas.filters.roles import RoleFilter
 from models.rights import RoleRightORM
 from models.roles import RoleORM
 from models.structures import StructureORM
@@ -17,7 +19,8 @@ from schemas.roles import (
     SRoleInfo, 
     SRolePage,
     SRolePreview,
-    SRoleSearchResponse
+    SRoleSearchResponse,
+    SRoleSelectResponse
 )
 from utils.absract.service import BaseService
 from utils.enums.rights import CreateVacancyRigth, EditOtherRight
@@ -35,7 +38,7 @@ class RoleService(BaseService):
     ) -> SRoleSearchResponse:
         offset = self.get_offset(pagination)
         async with self.uow:
-            result: list[RoleORM] = (await self.uow.roles.search(filters, offset))
+            result: list[RoleORM] = (await self.uow.roles.search(filters))
             return SRoleSearchResponse(
                 result=[
                     SRolePreview(
@@ -47,64 +50,111 @@ class RoleService(BaseService):
                                 if r.structure.enclosure_id is None
                                 else r.structure.org.name
                             )
-                        )(role)
+                        )(role),
+                        level=role.level
                     )
                     for role
-                    in result
-                ]
+                    in result[offset[0]:offset[1]]
+                ],
+                pagination=SPaginationResponse(
+                    page=pagination.page,
+                    size=pagination.size,
+                    total=self.get_total_pagination(len(result), pagination.size)
+                )
             )
-
+        
+    
+    async def get_role_cookie(self, user: UserORM, role_id: UUID) -> JSONResponse:
+        if type(role:= await self.check_role(user, role_id, get_mode=True)) == RoleORM:
+            content = SRoleSelectResponse(
+                id=role.id,
+                name=role.name,
+                level=role.level
+            ).model_dump(mode="json")
+            response = JSONResponse(content=content)
+            response.set_cookie(key="role_id", value=role_id)
+            return response
+        else:
+            raise HTTPException(
+                status_code=422, 
+                detail=SRoleCheckResponce(
+                    request_key="role_id",
+                    role_id=role_id,
+                    status=role
+                ).model_dump(mode="json")
+            )
+        
 
     async def create_subordinate(
         self, 
         user: UserORM, 
         role_id: UUID, 
         data: SCreateSubordinate | SCreateStructHead
-    ) -> SCreateRoleResponse | SRoleCheckResponce:
+    ) -> SCreateRoleResponse:
+        if not data.chief_id:
+            data.chief_id = role_id
         status = await self.check_role(user, role_id)
         if status != CheckRoleStatus.belong:
-            return SRoleCheckResponce(
-                status=status,
-                request_key="role_id",
-                role_id=role_id
+            raise HTTPException(
+                status_code=400,
+                detail=SRoleCheckResponce(
+                    status=status,
+                    request_key="role_id",
+                    role_id=role_id
+                ).model_dump(mode="json")
             )
         async with self.uow:
             chief_role: RoleORM = await self.uow.roles.get(data.chief_id)
             if chief_role is None:
-                return SRoleCheckResponce(
-                    status=CheckRoleStatus.unexist,
-                    request_key="chief_id",
-                    role_id=data.chief_id
+                raise HTTPException(
+                    status_code=404,
+                    detail= SRoleCheckResponce(
+                        status=CheckRoleStatus.unexist,
+                        request_key="chief_id",
+                        role_id=data.chief_id
+                    ).model_dump(mode="json")
                 )
             creator_role: RoleORM = await self.uow.roles.get_for_page(role_id)
             if not (await self.can_create_roles(creator_role, chief_role)):
-                return SRoleCheckResponce(
-                    status=CheckRoleStatus.forbidden,
-                    request_key="role_id",
-                    role_id=role_id
+                raise HTTPException(
+                    status_code=403,
+                    detail=SRoleCheckResponce(
+                        status=CheckRoleStatus.forbidden,
+                        request_key="role_id",
+                        role_id=role_id
+                    ).model_dump(mode="json")
                 )
             level = chief_role.level + 1
             if type(data) == SCreateStructHead:
                 struct: StructureORM = await self.uow.structs.get(struct_id:=data.structure_id)
                 if struct is None:
-                    return SRoleCheckResponce(
-                        status=CheckRoleStatus.unexist,
-                        role_id=struct_id,
-                        request_key="struct_id"
+                    raise HTTPException(
+                        status_code=404,
+                        detail=SRoleCheckResponce(
+                            status=CheckRoleStatus.unexist,
+                            role_id=struct_id,
+                            request_key="struct_id"
+                        ).model_dump(mode="json")
                     )
                 if struct.head_id is not None:
-                    return SRoleCheckResponce(
-                        status=CheckRoleStatus.error,
-                        role_id=struct_id,
-                        request_key="struct_id",
-                        comment=f"struct head already exist: {struct.head_id}"
+                    raise HTTPException(
+                        status_code=409,
+                        detail= SRoleCheckResponce(
+                            status=CheckRoleStatus.error,
+                            role_id=struct_id,
+                            request_key="struct_id",
+                            comment=f"struct head already exist: {struct.head_id}"
+                        )
                     )
                 if struct.enclosure_id != chief_role.structure_id:
-                    return SRoleCheckResponce(
-                        status=CheckRoleStatus.unbelonged,
-                        role_id=struct_id,
-                        request_key="struct_id",
-                        comment="chief must be staff of oversturct"
+                    raise HTTPException(
+                        status_code=400,
+                        detail= SRoleCheckResponce(
+                            status=CheckRoleStatus.unbelonged,
+                            role_id=struct_id,
+                            request_key="struct_id",
+                            comment="chief must be staff of oversturct"
+                        )
                     )
             else:
                 struct_id = chief_role.structure_id
@@ -125,9 +175,12 @@ class RoleService(BaseService):
             await self.uow.rights.add_one(rights)
             await self.uow.commit()
         if id is None:
-            return SRoleCheckResponce(
-                status=CheckRoleStatus.error,
-                comment="database error"
+            raise HTTPException(
+                status_code=404,
+                detail= SRoleCheckResponce(
+                    status=CheckRoleStatus.error,
+                    comment="database error"
+                ).model_dump(mode="json")
             )
         else:
             role_data.update({"id": id})
@@ -137,14 +190,17 @@ class RoleService(BaseService):
             )
 
 
-    async def check_role(self, user: UserORM, role_id: UUID) -> CheckRoleStatus:
-        if type(user) != UserORM:
-            return CheckRoleStatus.unbelonged
+    async def check_role(self, user: UserORM, role_id: UUID, get_mode=False) -> CheckRoleStatus|RoleORM:
         async with self.uow:
             role = await self.uow.roles.get(role_id)
             if type(role) != RoleORM:
                 return CheckRoleStatus.unexist
+            if type(user) != UserORM:
+                return CheckRoleStatus.unbelonged
             if role.user_id == user.id:
+                if get_mode:
+                    await self.uow.commit(flush=True)
+                    return role
                 return CheckRoleStatus.belong
             else:
                 return CheckRoleStatus.unbelonged
@@ -219,7 +275,7 @@ class RoleService(BaseService):
         self,
         user: UserORM,
         request: SGetRolePageRequest
-    )-> SRoleRights | SRoleCheckResponce:
+    )-> SRoleRights:
         target_status = await self.check_role(user, request.target_id)
         flag = False
         if target_status == CheckRoleStatus.unbelonged:
@@ -228,7 +284,7 @@ class RoleService(BaseService):
                 target_role: RoleORM = await self.uow.roles.get_for_info(request.target_id)
                 request_role: RoleORM = await self.uow.roles.get_for_info(request.role_id)
                 if target_role is None or request_role is None:
-                    return SRoleCheckResponce(status=CheckRoleStatus.error)
+                    raise SRoleCheckResponce(status=CheckRoleStatus.error)
 #TODO replace to can_view_role func
                 if request_role.structure.org_id == target_role.structure.org_id:
                     flag = True
@@ -242,10 +298,13 @@ class RoleService(BaseService):
                     rights.__dict__.items()
                 ))
             return SRoleRights(**data)
-        return SRoleCheckResponce(
-            status=target_status,
-            request_key="target_id",
-            role_id=request.target_id
+        raise HTTPException(
+            code=400,
+            detail=SRoleCheckResponce(
+                status=target_status,
+                request_key="target_id",
+                role_id=request.target_id
+            ).model_dump(mode="json")
         )
             
 
@@ -253,13 +312,16 @@ class RoleService(BaseService):
         self, 
         user: UserORM|None, 
         request: SGetRolePageRequest
-    ) -> SRoleInfo | SRolePage | SRoleCheckResponce:
+    ) -> SRoleInfo | SRolePage:
         status = await self.check_role(user, request.target_id)
         if status == CheckRoleStatus.unexist:
-            return SRoleCheckResponce(
-                status=status.value,
-                request_key="target_id",
-                role_id=request.target_id
+            raise HTTPException(
+                status_code=404,
+                detail=SRoleCheckResponce(
+                    status=status.value,
+                    request_key="target_id",
+                    role_id=request.target_id
+                ).model_dump(mode="json")
             )
         async with self.uow:
             data = {}

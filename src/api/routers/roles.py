@@ -29,7 +29,7 @@ async def search_roles(
     return await RoleService(uow).search(filters, pagination)
 
 
-@roles.get("/home")
+@roles.get("/my-roles")
 async def my_roles(
     uow: RoleUOWDep,
     user: UserORM = Depends(get_verified),
@@ -52,17 +52,17 @@ async def get_role_page(
     user: Annotated[UserORM, Depends(get_optional)],
     uow: RoleUOWDep,
     request: Annotated[SGetRolePageRequest, Depends()]
-) -> SRoleInfo | SRolePage | SRoleCheckResponce:
+) -> SRoleInfo | SRolePage:
     return await RoleService(uow).get_role_page(user, request)
 
 
-@roles.get("/{role_id}/check")
+@roles.get("/{target_id}/check")
 async def check_role(
     user: Annotated[UserORM, Depends(get_verified)],
     uow: RoleUOWDep,
-    role_id: UUID
+    target_id: UUID
 ) -> SRoleCheckResponce:
-    return SRoleCheckResponce(status=await RoleService(uow).check_role(user, role_id))
+    return SRoleCheckResponce(status=await RoleService(uow).check_role(user, target_id))
 
 
 @roles.get("/{target_id}/rights")
@@ -70,7 +70,7 @@ async def get_role_rights(
     user: Annotated[UserORM, Depends(get_verified)],
     uow: RoleUOWDep,
     request: Annotated[SGetRolePageRequest, Depends()]
-) -> SRoleRights | SRoleCheckResponce:
+) -> SRoleRights:
     return await RoleService(uow).get_role_rights(user, request)
 
 
@@ -80,7 +80,7 @@ async def create_subordinate(
     uow: RoleUOWDep,
     role_id: RoleUUID = None,
     request: SCreateSubordinate = Depends()
-) -> SCreateRoleResponse | SRoleCheckResponce:
+) -> SCreateRoleResponse:
     return await RoleService(uow).create_subordinate(user, role_id, request)
 
 
@@ -90,5 +90,5 @@ async def create_struct_head(
     uow: StructUOWDep,
     role_id: RoleUUID = None,
     request: SCreateStructHead = Depends()
-) -> SCreateRoleResponse | SRoleCheckResponce:
+) -> SCreateRoleResponse:
     return await RoleService(uow).create_subordinate(user, role_id, request)
