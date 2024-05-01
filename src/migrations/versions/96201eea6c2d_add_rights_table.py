@@ -105,4 +105,5 @@ def downgrade() -> None:
     sendpetitionvector.drop(op.get_bind(), checkfirst=False)
     rejecttaskright.drop(op.get_bind(), checkfirst=False)
     editotherright.drop(op.get_bind(), checkfirst=False)
+    createstructright.drop(op.get_bind(), checkfirst=False)
     # ### end Alembic commands ###
