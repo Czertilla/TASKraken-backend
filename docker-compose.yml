@@ -7,7 +7,7 @@ services:
     env_file:
       - .env-non-dev
     volumes:
-      - data-volume:/var/lib/postgresql/data
+      - data-volume:/var/lib/postgresql/TASK/data
 
   app:
     build:
