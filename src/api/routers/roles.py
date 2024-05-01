@@ -1,11 +1,12 @@
 from typing import Annotated
 from uuid import UUID
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Cookie, Depends
+from fastapi.responses import JSONResponse
 from fastapi_filter import FilterDepends
 
 from api.auth.auth import fastapi_users
-from api.dependencies import RoleUOWDep, StructUOWDep
-from filters.roles import RoleFilter
+from api.dependencies import RoleUOWDep, RoleUUID, StructUOWDep
+from schemas.filters.roles import RoleFilter
 from models.users import UserORM
 from schemas.pagination import SPaginationRequest
 from schemas.rights import SRoleRights
@@ -35,6 +36,15 @@ async def my_roles(
     pagination: SPaginationRequest = Depends()
 ) -> SRoleSearchResponse:
     return await RoleService(uow).search(RoleFilter(user_id=user.id), pagination)
+
+
+@roles.get("/{role_id}/select")
+async def select_role(
+    uow: RoleUOWDep,
+    role_id: UUID,
+    user: UserORM = Depends(get_verified)
+) -> JSONResponse:
+    return await RoleService(uow).get_role_cookie(user, role_id)
 
 
 @roles.get("/{target_id}")
@@ -68,7 +78,7 @@ async def get_role_rights(
 async def create_subordinate(
     user: Annotated[UserORM, Depends(get_verified)],
     uow: RoleUOWDep,
-    role_id: UUID,
+    role_id: RoleUUID = None,
     request: SCreateSubordinate = Depends()
 ) -> SCreateRoleResponse | SRoleCheckResponce:
     return await RoleService(uow).create_subordinate(user, role_id, request)
@@ -78,7 +88,7 @@ async def create_subordinate(
 async def create_struct_head(
     user: Annotated[UserORM, Depends(get_verified)],
     uow: StructUOWDep,
-    role_id: UUID,
+    role_id: RoleUUID = None,
     request: SCreateStructHead = Depends()
 ) -> SCreateRoleResponse | SRoleCheckResponce:
     return await RoleService(uow).create_subordinate(user, role_id, request)

@@ -2,7 +2,7 @@ from typing import Annotated
 from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from api.auth.auth import fastapi_users
-from api.dependencies import StructUOWDep
+from api.dependencies import RoleUUID, StructUOWDep
 from models.users import UserORM
 from schemas.structures import SCreateStruct, SCreateStructResponse, SRegistOrganization, SRegistOrgResponse
 from services.roles import RoleService
@@ -30,7 +30,7 @@ async def regist_organization(
 async def create_substruct(
     user: Annotated[UserORM, Depends(get_verified)],
     uow: StructUOWDep,
-    role_id: UUID,
+    role_id: RoleUUID = None,
     request: SCreateStruct = Depends()
 )-> SCreateStructResponse:
     if (status:=await RoleService(uow).check_role(user, role_id)) != CheckRoleStatus.belong:
