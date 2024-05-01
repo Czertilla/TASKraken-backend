@@ -29,6 +29,20 @@ class RoleRepo(BaseRepo):
             ),
             offset=offset
         )
+    
+
+    async def get_with_assignments(self, id: UUID):
+        return await self.get_with_options(
+            id, 
+            (joinedload(self.model.created_tasks),)
+        )
+    
+
+    async def get_with_tasks(self, id: UUID):
+        return await self.get_with_options(
+            id,
+            (selectinload(self.model.tasks),)
+        )
 
 
     async def get_for_info(self, id: UUID):
@@ -46,6 +60,15 @@ class RoleRepo(BaseRepo):
                 selectinload(self.model.subordinates),
                 joinedload(self.model.rights)
              )
+        )
+    
+
+    async def get_for_projects(self, id: UUID):
+        return await self.get_with_options(
+            id,
+            (
+                selectinload(self.model.created_projects),
+            )
         )
 
 
