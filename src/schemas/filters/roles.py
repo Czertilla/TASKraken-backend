@@ -9,9 +9,10 @@ from pydantic import Field, validator
 from models.roles import RoleORM
 
 
-from filters.structures import StructureFilter
+from schemas.filters.structures import StructureFilter
 
 class RoleFilter(Filter):
+    id__in: Annotated[list[UUID], Field("id_list")] = None
     name__in: Annotated[list[str], Field(alias="names")] = None
     user_id: Annotated[Optional[UUID], Field(alias="owner")] = None
     level__gte: Annotated[int, Field(alias="level_gte", default=0, ge=0)]
