@@ -1,8 +1,12 @@
 from .users import users_router
 from .structures import structs_router
 from .roles import roles as roles_router
+from .tasks import task_router
+from .projects import project_router
 routers = (
     structs_router,
+    project_router,
+    task_router,
     roles_router,
     users_router
 )
