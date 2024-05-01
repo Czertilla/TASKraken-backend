@@ -11,7 +11,7 @@ from utils.enums.roles import CheckRoleStatus, ViewMode
 class SCreateSubordinate(BaseModel):
     name: Annotated[str, Query(max_length=64)]
     rights: Annotated[SRoleRights, Query(title='Vacancy rights')] = Depends()
-    chief_id: UUID
+    chief_id: Annotated[UUID|None, Query(default=None)] = None
 
     class Config:
         from_atributes = True
@@ -67,10 +67,17 @@ class SCreateRoleResponse(BaseModel):
     rights: Annotated[SRoleRights, Field()]
 
 
-class SRolePreview(BaseModel):
+class SRoleSelectResponse(BaseModel):
     id: UUID
     name: Annotated[str, Field(max_length=64)]
-    organization_name: str|None
+    level: int = None
+
+
+class SRolePreview(SRoleSelectResponse):
+    id: UUID
+    name: Annotated[str, Field(max_length=64)]
+    organization_name: str|None = None
+    level: int = None
 
 
 class SRoleSearchResponse(BaseModel):
