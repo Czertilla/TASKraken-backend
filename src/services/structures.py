@@ -20,12 +20,11 @@ class StructureService(BaseService):
                 "name": org_data.pop("gen_dir_name"),
                 "user_id": user.id
             }
-            org: StructureORM = await self.uow.structs.get(
-                structure_id:= await self.uow.structs.add_one(org_data)
-            )
+            org: StructureORM = await self.uow.structs.add_n_return(org_data)
             gen_dir_data.update({
-                "structure_id": structure_id
+                "structure_id": org.id
             })
+            org.org_id = org.id
             head_id = await self.uow.roles.add_one(gen_dir_data)
             org.head_id = head_id
             await self.uow.rights.add_one({
@@ -35,7 +34,7 @@ class StructureService(BaseService):
             await self.uow.commit(True)
         return SRegistOrgResponse(
             gen_dir_id=head_id,
-            org_id=structure_id
+            org_id=org.id
         )
     
 
