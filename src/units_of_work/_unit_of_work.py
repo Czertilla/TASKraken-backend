@@ -20,7 +20,9 @@ class UnitOfWork(ABCUnitOfWork):
         await self.rollback()
         await self.session.close()
 
-    async def commit(self):
+    async def commit(self, flush=False):
+        if flush:
+            await self.session.flush()
         await self.session.commit()
 
 

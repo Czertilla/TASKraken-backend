@@ -10,7 +10,6 @@ from repositories.users import UserRepo
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
     username: str
-    role: str
     class Config:
         from_atributes = True
 
@@ -18,5 +17,6 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
 class UserCreate(schemas.BaseUserCreate):
     username: str
 
+
 class UserUpdate(schemas.BaseUserUpdate):
-    pass
+    username: str

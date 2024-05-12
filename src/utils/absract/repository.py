@@ -6,11 +6,15 @@ class AbstractRepository(ABC):
         raise NotImplementedError
     
     @abstractmethod
+    async def add_n_return():
+        raise NotImplementedError
+    
+    @abstractmethod
     async def find_by_id():
         raise NotImplementedError
 
     @abstractmethod
-    async def find_all():
+    async def search():
         raise NotImplementedError
 
     @abstractmethod

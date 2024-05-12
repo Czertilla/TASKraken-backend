@@ -88,7 +88,7 @@ def upgrade() -> None:
         sa.Column('creator_id', sa.Uuid(), nullable=False),
         sa.Column('edited_at', sa.DateTime(timezone=True), nullable=True),
         sa.Column('deadline', sa.DateTime(timezone=True), nullable=True),
-        sa.Column('status', sa.Enum('created', 'frozen', 'resumed', 'closed', 'completed', name='taskstatus'), nullable=False),
+        sa.Column('status', taskstatus, nullable=False),
         sa.Column('status_timestamp', sa.DateTime(timezone=True), nullable=False),
         sa.Column('id', sa.Uuid(), nullable=False),
         sa.ForeignKeyConstraint(['creator_id'], ['roles.id'], ),
