@@ -4,8 +4,6 @@ services:
     image: postgres:16
     container_name: db
     command: -p 5454
-    ports:
-      - 5050:5454
     env_file:
       - .env-non-dev
     volumes:
@@ -22,6 +20,14 @@ services:
       - 80:8000
     depends_on:
       - db
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    env_file:
+      - .env-non-dev
+    ports:
+      - 5050:80
 
 volumes:
   data-volume:
