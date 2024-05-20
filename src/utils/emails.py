@@ -21,11 +21,13 @@ fm = FastMail(conf)
 
 
 async def send_verify_message(email: EmailStr, token: str) -> JSONResponse:
+    with open("res/verify_message.html", 'r') as f:
+        html = f.read().replace("${token}", token)
     message = MessageSchema(
         subject="Thanks for using TASKraken",
         recipients=[email],
-        body=f"To confirm your enter this token to request in uoyr client. DO NOT do it, if you have not registered this email. Let us know by replying to this email\nyour token: {token}",
-        subtype=MessageType.plain
+        body=html,
+        subtype=MessageType.html
     )
     await fm.send_message(message)
     return JSONResponse(status_code=200, content={"message": "email has been sent"})
