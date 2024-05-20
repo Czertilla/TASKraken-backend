@@ -15,30 +15,8 @@ def get_verify_router(
 ):
     router = APIRouter()
 
-    @router.post(
-        "/request-verify-token",
-        status_code=status.HTTP_202_ACCEPTED,
-        name="verify:request-token",
-    )
-    async def request_verify_token(
-        request: Request,
-        email: EmailStr = Body(..., embed=True),
-        user_manager: BaseUserManager[models.UP, models.ID] = Depends(get_user_manager),
-    ):
-        try:
-            user = await user_manager.get_by_email(email)
-            await user_manager.request_verify(user, request)
-        except (
-            exceptions.UserNotExists,
-            exceptions.UserInactive,
-            exceptions.UserAlreadyVerified,
-        ):
-            pass
-
-        return None
-
     @router.get(
-        "/verify",
+        "/verify/email",
         response_model=user_schema,
         name="verify:verify",
         responses={
