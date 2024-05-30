@@ -11,7 +11,7 @@ if TYPE_CHECKING:
 class ChecklistORM(Base):
     __tablename__ = "checklists"
 
-    task_id: Mapped[UUID] = mapped_column(ForeignKey("tasks.id", ondelete="CASCADE"))
+    task_id: Mapped[UUID|None] = mapped_column(ForeignKey("tasks.id", ondelete="CASCADE"), nullable=True)
     name: Mapped[str]
 
     task: Mapped["TaskORM"] = relationship(back_populates="checklists")
