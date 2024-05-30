@@ -1,4 +1,5 @@
 from api.auth.auth import fastapi_users, auth_backend
+from api.auth.routers.verify import get_verify_router
 from schemas.auth import UserCreate, UserRead, UserUpdate
 
 from fastapi import FastAPI
@@ -34,6 +35,12 @@ def include_routers(app: FastAPI):
 
     app.include_router(
         fastapi_users.get_verify_router(UserRead),
+        prefix="/auth",
+        tags=["auth"]
+    )
+
+    app.include_router(
+        get_verify_router(fastapi_users.get_user_manager, UserRead),
         prefix="/auth",
         tags=["auth"],
     )

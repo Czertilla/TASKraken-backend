@@ -1,3 +1,4 @@
+from repositories.checklists import CheckListRepo
 from repositories.files import FileRepo, FolderRepo
 from repositories.rights import RightRepo
 from repositories.roles import RoleRepo
@@ -11,5 +12,6 @@ class TaskUOW(UnitOfWork):
         self.files = FileRepo(self.session)
         self.folders = FolderRepo(self.session)
         self.roles = RoleRepo(self.session)
+        self.checklists = CheckListRepo(self.session)
         self.tasks = TaskRepo(self.session)
         return rtrn

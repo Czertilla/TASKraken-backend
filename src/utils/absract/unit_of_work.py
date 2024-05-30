@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Type
 
+from repositories.checklists import CheckListRepo
 from repositories.files import FileRepo, FolderRepo
 from repositories.projects import ProjectRepo
 from repositories.rights import RightRepo
@@ -19,6 +20,7 @@ class ABCUnitOfWork(ABC):
     structs: Type[StructureRepo]
     projects: Type[ProjectRepo]
     tasks: Type[TaskRepo]
+    checklists: Type[CheckListRepo]
 
     @abstractmethod
     def __init__(self):
