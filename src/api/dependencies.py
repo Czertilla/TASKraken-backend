@@ -12,6 +12,7 @@ from utils.absract.unit_of_work import ABCUnitOfWork
 
 RoleUUID = Annotated[UUID, Cookie()]
 ProjectUUID = Annotated[UUID, Cookie()]
+TaskUUID = Annotated[UUID, Cookie()]
 
 StructUOWDep = Annotated[ABCUnitOfWork, Depends(StructureUOW)]
 UsersUOWDep = Annotated[ABCUnitOfWork, Depends(UserUOW)]

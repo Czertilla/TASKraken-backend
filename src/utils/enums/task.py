@@ -10,3 +10,12 @@ class TaskStatus(AEnum):
     completed = "completed"
 
     __default__ = created
+
+
+class TaskViewMode(AEnum):
+    responsible = "responsible"
+    creator = "creator"
+    rejected = "rejected"
+    error = "error"
+
+    __default__ = rejected

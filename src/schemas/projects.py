@@ -10,8 +10,10 @@ from schemas.pagination import SPaginationResponse
 from schemas.rights import SHeadRights, SRoleRights
 from schemas.roles import SRolePreview
 from utils.enums.projects import CheckProjectStatus
+from utils.enums.task import TaskStatus, TaskViewMode
 
-comment_empt = "you can leave it empty"
+COMMENT_EMPTY = "you can leave it empty"
+MAX_NAME_LEN = 128
 
 class SAddCheckList(BaseModel):
     name: Annotated[str, Form(max_length=64)]
@@ -30,14 +32,14 @@ class SAddCheckList(BaseModel):
 
 
 class SAddCheckListMixin(BaseModel):
-    checklists: list[SAddCheckList] = Body(description=comment_empt, min_items=0)
+    checklists: list[SAddCheckList] = Body(description=COMMENT_EMPTY, min_items=0)
 
     class Config:
         from_atributes = True
 
 
 class SCreateProjectRequest(BaseModel):
-    name: Annotated[str, Form(max_length=128)]
+    name: Annotated[str, Form(max_length=MAX_NAME_LEN)]
     desctription: Annotated[str|None, Form(max_leng=2048, default="")] = None
     deadline: datetime|None = None
 
@@ -47,7 +49,7 @@ class SCreateProjectRequest(BaseModel):
 
 class SCreateTaskRequest(SCreateProjectRequest, SAddCheckListMixin):
     project_id: ProjectUUID
-    files: list[UploadFile] = File(description=comment_empt, min_items=0)
+    files: list[UploadFile] = File(description=COMMENT_EMPTY, min_items=0)
     responsobilities: list[UUID] = Form(..., min_items=1)
 
 
@@ -55,7 +57,7 @@ class SCreateTaskResponse(SCreateProjectRequest):
     id: UUID
     responsobilities: list[SRolePreview]
     creator_id: UUID
-    status: str
+    status: Annotated[TaskStatus, Field()]
     level: int
 
     class Confing:
@@ -66,7 +68,7 @@ class SCreateProjectResponse(SCreateProjectRequest):
     id: UUID
     organization_id: UUID
     creator_id: UUID
-    status: str
+    status: Annotated[CheckProjectStatus, Field()]
     
     class Config:
         from_atributes = True
@@ -107,3 +109,30 @@ class SProjectCheckResponce(BaseModel):
 
     class Config:
         from_atributes = True
+
+
+# class SCreateSubTaskRequest(BaseModel):
+#     fromtask_id: Annotated[UUID, Query()]
+#     name: Annotated[str, Query(max_length=MAX_NAME_LEN)]
+#     description: Annotated[str, Query(max_length=)]
+
+
+# class SCreateSubTaskResponse(BaseModel):
+#     fromtask_id: Annotated[UUID, Field()]
+#     name: Annotated[str, Query(max_length=MAX_NAME_LEN)]
+#     description: Annotated[str, Query(max_length=)]
+
+
+class STaskPage(BaseModel):
+    view_mode: Annotated[TaskViewMode, Field()]
+    name: Annotated[str, Field()]
+    descripition: Annotated[str, Field()]
+    status: Annotated[TaskStatus, Field()]
+    deadline = Annotated[datetime|None, Field()] = None
+    checklists: Annotated[SAddCheckList, Field()] = SAddCheckList()
+    responsobilities = Annotated[list[SRolePreview], Field()] = []
+    project = Annotated[SProjectPreview, Field()]
+    overtask = Annotated[STaskPreview|None, Field()]
+    subtasks = Annotated[list[STaskPreview], Field()] = []
+    created_at = Annotated[datetime, Field()]
+    edited_at = Annotated[datetime|None, Field ()] = None

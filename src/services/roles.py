@@ -306,7 +306,7 @@ class RoleService(BaseService):
                 role_id=request.target_id
             ).model_dump(mode="json")
         )
-            
+
 
     async def get_role_page(
         self, 
