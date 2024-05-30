@@ -11,6 +11,12 @@ class TaskStatus(AEnum):
 
     __default__ = created
 
+    def __bool__(self):
+        return self.value in {
+            self.created.value,
+            self.resumed.value
+        } 
+
 
 class TaskViewMode(AEnum):
     responsible = "responsible"
