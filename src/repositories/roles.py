@@ -8,6 +8,7 @@ from logging import getLogger
 
 from models import RoleORM
 from models.structures import StructureORM
+from models.tasks import TaskORM
 from utils.enums.roles import DownstreamStatus
 
 logger = getLogger(__name__)
@@ -34,14 +35,16 @@ class RoleRepo(BaseRepo):
     async def get_with_assignments(self, id: UUID):
         return await self.get_with_options(
             id, 
-            (joinedload(self.model.created_tasks),)
+            (joinedload(self.model.created_tasks)
+             .joinedload(TaskORM.creator),)
         )
     
 
     async def get_with_tasks(self, id: UUID):
         return await self.get_with_options(
             id,
-            (selectinload(self.model.tasks),)
+            (selectinload(self.model.tasks)
+             .joinedload(TaskORM.creator),)
         )
 
 
