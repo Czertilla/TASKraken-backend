@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 from typing import Annotated, ClassVar, List, Optional, Union
 from uuid import UUID
-from fastapi import Body, Depends, File, Form, Query, UploadFile
+from fastapi import Body, Cookie, Depends, File, Form, Query, UploadFile
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 from api.dependencies import ProjectUUID
@@ -13,7 +13,8 @@ from utils.enums.projects import CheckProjectStatus
 from utils.enums.task import TaskStatus, TaskViewMode
 
 COMMENT_EMPTY = "you can leave it empty"
-MAX_NAME_LEN = 128
+MAX_NAME_LEN = 128  
+
 
 class SAddCheckList(BaseModel):
     name: Annotated[str, Form(max_length=64)]
@@ -37,6 +38,24 @@ class SAddCheckListMixin(BaseModel):
     class Config:
         from_atributes = True
 
+
+class SViewCheckpoints(BaseModel):
+    id: UUID = None
+    name: Annotated[str, Field(max_length=MAX_NAME_LEN)]
+    done: bool = False
+
+    class Config:
+        from_atributes = True
+
+
+class SViewChecklist(BaseModel):
+    id: UUID = None
+    name: Annotated[str, Field(max_length=MAX_NAME_LEN)]
+    points: list[SViewCheckpoints]
+
+    class Config:
+        from_atributes = True
+        
 
 class SCreateProjectRequest(BaseModel):
     name: Annotated[str, Form(max_length=MAX_NAME_LEN)]
@@ -86,12 +105,19 @@ class SProjectPreview(BaseModel):
 
 
 class STaskPreview(SProjectPreview):
+    _description_limit: ClassVar[int] = 50
     organization_id: ClassVar[None]
-    project_id: UUID
-    project_name: str
+
+    id: UUID
+    name: str
+    description: Annotated[str, Field(max_length=_description_limit)]
+    creator_name: str = None
+    deadline: datetime|None = None
+    created_at: datetime
+    edited_at: datetime | None = None
 
 
-class SMyTasksresponse(BaseModel):
+class SMyTasksResponse(BaseModel):
     result: list[STaskPreview]
     pagination: SPaginationResponse
 
@@ -111,28 +137,39 @@ class SProjectCheckResponce(BaseModel):
         from_atributes = True
 
 
-# class SCreateSubTaskRequest(BaseModel):
-#     fromtask_id: Annotated[UUID, Query()]
-#     name: Annotated[str, Query(max_length=MAX_NAME_LEN)]
-#     description: Annotated[str, Query(max_length=)]
+class SCreateSubTaskRequest(BaseModel):
+    fromtask_id: Annotated[UUID, Query()]
+    name: Annotated[str, Query(max_length=MAX_NAME_LEN)]
+    description: Annotated[str, Query(max_length=500)]
 
 
-# class SCreateSubTaskResponse(BaseModel):
-#     fromtask_id: Annotated[UUID, Field()]
-#     name: Annotated[str, Query(max_length=MAX_NAME_LEN)]
-#     description: Annotated[str, Query(max_length=)]
+class SCreateSubTaskResponse(BaseModel):
+    task_id: Annotated[UUID, Field()]
+    fromtask_id: Annotated[UUID, Field()]
+    name: Annotated[str, Query(max_length=MAX_NAME_LEN)]
+    description: Annotated[str, Query(max_length=500)]
 
 
 class STaskPage(BaseModel):
     view_mode: Annotated[TaskViewMode, Field()]
+    id: Annotated[UUID, Field()]
     name: Annotated[str, Field()]
     descripition: Annotated[str, Field()]
     status: Annotated[TaskStatus, Field()]
-    deadline = Annotated[datetime|None, Field()] = None
-    checklists: Annotated[SAddCheckList, Field()] = SAddCheckList()
-    responsobilities = Annotated[list[SRolePreview], Field()] = []
-    project = Annotated[SProjectPreview, Field()]
-    overtask = Annotated[STaskPreview|None, Field()]
-    subtasks = Annotated[list[STaskPreview], Field()] = []
-    created_at = Annotated[datetime, Field()]
-    edited_at = Annotated[datetime|None, Field ()] = None
+    deadline: Annotated[datetime|None, Field()] = None
+    checklists: Annotated[list[SViewChecklist], Field()]
+    responsobilities: Annotated[list[SRolePreview], Field()] = []
+    # TODO implement
+    # project : Annotated[SProjectPreview, Field()]
+    # overtask : Annotated[STaskPreview|None, Field()]
+    # subtasks : Annotated[list[STaskPreview], Field()] = []
+    created_at : Annotated[datetime, Field()]
+    edited_at : datetime|None = None
+
+    class Config:
+        from_atributes = True
+
+class SPutTaskRequest(STaskPage):
+    responsobilities: Annotated[list[UUID], Field()] = []
+    # TODO implement
+    # subtasks : Annotated[list[STaskPreview], Field()] = []
