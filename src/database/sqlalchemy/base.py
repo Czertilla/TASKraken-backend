@@ -7,7 +7,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from uuid import UUID
-from sqlalchemy import ReturnsRows, Result, insert, select
+from sqlalchemy import ReturnsRows, Result, insert, select, update
 from utils.absract.repository import AbstractRepository
 from fastapi_filter.contrib.sqlalchemy import Filter
  
@@ -68,6 +68,18 @@ class SQLAlchemyRepository(AbstractRepository):
         await self.session.merge(data_orm)
         if flush:
             await self.session.flush()
+
+
+    async def update(self, data_orm: model, flush=False):
+        stmt = (
+            update(self.model)
+            .where(self.model.id == data_orm.id)
+            .values(**data_orm.__dict__)
+        )
+        result = (await self.execute(stmt)).unique().scalar_one_or_none()
+        if flush:
+            await self.session.flush()
+        return result
 
 
     async def add_one(self, data: dict) -> UUID:
