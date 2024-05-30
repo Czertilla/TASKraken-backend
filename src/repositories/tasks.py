@@ -1,6 +1,7 @@
 from uuid import UUID
 \
 from database import BaseRepo
+from models.checklists import ChecklistORM
 from models.tasks import TaskORM
 from sqlalchemy.orm import selectinload, joinedload
 
@@ -23,6 +24,8 @@ class TaskRepo(BaseRepo):
             options=(
                 selectinload(self.model.responsibles),
                 selectinload(self.model.subtasks),
+                selectinload(self.model.checklists)
+                    .selectinload(ChecklistORM.checkpoints),
                 joinedload(self.model.project),
                 joinedload(self.model.head_task)
             )
