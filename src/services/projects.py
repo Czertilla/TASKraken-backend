@@ -113,7 +113,7 @@ class ProjectService(BaseService):
                 raise HTTPException(status_code=403, detail=f"role {role_id} has not right")
             request_data: dict = request.model_dump()
             request_data.update({
-                "organization_id": role.structure.org_id,
+                "organization_id": role.structure.org_id if role.structure.org_id else role.structure_id,
                 "creator_id": role.id,
 
             })
@@ -121,7 +121,7 @@ class ProjectService(BaseService):
             status: TaskStatus = await self.uow.projects.get_status(id)
             request_data.update({
                 "id": id,
-                "status": status
+                "status": status.value
             })
             await self.uow.commit()
         return SCreateProjectResponse(**request_data)
@@ -130,31 +130,33 @@ class ProjectService(BaseService):
     async def add_task(
         self,
         role_id: UUID,
-        request: SCreateTaskRequest
+        request: SCreateTaskRequest,
+        project_id: UUID
     ) -> SCreateTaskResponse:
         async with self.uow:
             role: RoleORM = await self.uow.roles.get_for_page(role_id)
-            project: ProjectORM = await self.uow.projects.get(request.project_id)
+            project: ProjectORM = await self.uow.projects.get(project_id)
             if role.id != project.creator_id:
                 raise HTTPException(
                     status_code=403, 
-                    detail=f"project {request.project_id} doesn`t belong to role {role_id}"
+                    detail=f"project {project_id} doesn`t belong to role {role_id}"
                 )
             data: dict = request.model_dump()
-            files: list[UploadFile] = data.pop("files")
-            if files:
-                folder: FolderORM = await self.uow.folders.add_n_return({})
-                for file in files:
-                    folder.files.append(FileORM(
-                        name = file.filename,
-                        data = await file.read()
-                    ))
-                await self.uow.folders.merge(folder)
-                data.update({"folder_id": folder.id})
+            # files: list[UploadFile] = data.pop("files")
+            # TODO implement
+            # if files:
+            #     folder: FolderORM = await self.uow.folders.add_n_return({})
+            #     for file in files:
+            #         folder.files.append(FileORM(
+            #             name = file.filename,
+            #             data = await file.read()
+            #         ))
+            #     await self.uow.folders.merge(folder)
+            #     data.update({"folder_id": folder.id})
             checklists: list[dict] = data.pop("checklists")
             if checklists:
                 ...
-            data.update({"creator_id": role_id})
+            data.update({"creator_id": role_id, "project_id": project_id})
             resp_id_list: list[UUID] = data.pop("responsobilities")
             task: TaskORM = TaskORM(**data)
             task: TaskORM = await self.uow.tasks.add_n_return(data)

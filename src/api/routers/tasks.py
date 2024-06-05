@@ -39,7 +39,7 @@ async def my_tasks(
     pagination: SPaginationRequest = Depends()
 ) -> SMyProjectsResponse:
     if (status:= await RoleService(uow).check_role(user, role_id)) != CheckRoleStatus.belong:
-        raise HTTPException(status_code=422, detail=status)
+        raise HTTPException(status_code=422, detail=status.value)
     return await TaskService(uow).get_tasks_by_responsobility_id(role_id, pagination)
 
 
@@ -51,7 +51,7 @@ async def task_page(
     role_id: RoleUUID = None,
 ) -> STaskPage:
     if (status:= await RoleService(uow).check_role(user, role_id)) != CheckRoleStatus.belong:
-        raise HTTPException(status_code=422, detail=status)
+        raise HTTPException(status_code=422, detail=status.value)
     content = await TaskService(uow).get_task_page(role_id, task_id)
     response = JSONResponse(content = content.model_dump(mode="json"))
     response.set_cookie(key="task_id", value=str(content.id))
@@ -68,7 +68,7 @@ async def edit_task(
     role_id: RoleUUID = None,
 ) -> STaskPage:
     if (status:= await RoleService(uow).check_role(user, role_id)) != CheckRoleStatus.belong:
-        raise HTTPException(status_code=422, detail=status)
+        raise HTTPException(status_code=422, detail=status.value)
     content = await TaskService(uow).put_task(role_id, task)
     response = JSONResponse(content = content.model_dump(mode="json"))
     response.set_cookie(key="task_id", value=str(content.id))

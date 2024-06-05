@@ -67,9 +67,9 @@ class SCreateProjectRequest(BaseModel):
 
 
 class SCreateTaskRequest(SCreateProjectRequest, SAddCheckListMixin):
-    project_id: ProjectUUID
-    files: list[UploadFile] = File(description=COMMENT_EMPTY, min_items=0)
+    # files: list[UploadFile] = File(description=COMMENT_EMPTY, min_items=0)
     responsobilities: list[UUID] = Form(..., min_items=1)
+    # responsobility: UUID
 
 
 class SCreateTaskResponse(SCreateProjectRequest):
@@ -87,7 +87,8 @@ class SCreateProjectResponse(SCreateProjectRequest):
     id: UUID
     organization_id: UUID
     creator_id: UUID
-    status: Annotated[CheckProjectStatus, Field()]
+    status: str
+    # status: Annotated[CheckProjectStatus, Field()]
     
     class Config:
         from_atributes = True

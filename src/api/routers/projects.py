@@ -51,28 +51,34 @@ async def get_project_cookie(
 
 
 @project_router.post("/new")
-async def create_project(
+async def create_project(   
     user: Annotated[UserORM, Depends(verified_user)],
     uow: ProjectUOWDep,
     role_id: RoleUUID = None,
     request: SCreateProjectRequest = Depends()
 ) -> SCreateProjectResponse:
     if (status:= await RoleService(uow).check_role(user, role_id)) != CheckRoleStatus.belong:
-        raise HTTPException(status_code=422, detail=status)
-    return await ProjectService(uow).create_project(role_id, request)
+        raise HTTPException(status_code=422, detail=status.value)
+    response = await ProjectService(uow).create_project(role_id, request)
+    id = response.id
+    response = JSONResponse(content=response.model_dump(mode="json"))
+    response.set_cookie("project_id", id)
+    return response
 
 
-@project_router.post("/{project_id}/add-task")
+@project_router.post("/add-task")
 async def add_task(
     user: Annotated[UserORM, Depends(verified_user)],
     uow: ProjectUOWDep,
     request: Annotated[SCreateTaskRequest, Depends()],
-    role_id: RoleUUID = None
+    role_id: RoleUUID = None,
+    project_id: ProjectUUID = None
 ) -> SCreateTaskResponse:
     if (status:= await RoleService(uow).check_role(user, role_id)) != CheckRoleStatus.belong:
-        raise HTTPException(status_code=422, detail=status)
+        raise HTTPException(status_code=422, detail=status.value)
     if not (roles_list:= await TaskService(uow).can_send_task(role_id, request.responsobilities)):
         raise HTTPException(status_code=422, detail={
             "cannot send to": roles_list
         })
-    return await ProjectService(uow).add_task(role_id, request)
+    response = await ProjectService(uow).add_task(role_id, request, project_id)
+    return response
