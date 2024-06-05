@@ -7,19 +7,27 @@ services:
     env_file:
       - .env-non-dev
     volumes:
-      - data-volume:/var/lib/postgresql/data
+      - data-volume:/var/lib/postgresql/TASK/data
 
   app:
     build:
       context: .
     env_file:
       - .env-non-dev
-    container_name: fastapi_app
-    command: ["/fastapi_app/docker/app.sh"]
+    container_name: TASK_fastapi_app
+    command: ["/TASK_fastapi_app/docker/app.sh"]
     ports:
-      - 80:8000
+      - 8000:8000
     depends_on:
       - db
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    env_file:
+      - .env-non-dev
+    ports:
+      - 5050:80
 
 volumes:
   data-volume:

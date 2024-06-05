@@ -1,7 +1,15 @@
 from uuid import UUID
 
-from models.files import FileORM
+from models.files import FileORM, FolderORM
 from database import BaseRepo
+from sqlalchemy.orm import selectinload 
+
+
+class FolderRepo(BaseRepo):
+    model = FolderORM
+
+    async def add_n_return(self, data: dict) -> model:
+        return await super().add_n_return(data, (selectinload(self.model.files),))
 
 
 class FileRepo(BaseRepo):

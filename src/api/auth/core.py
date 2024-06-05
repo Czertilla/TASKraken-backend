@@ -2,12 +2,14 @@ import uuid
 from typing import Optional
 
 from fastapi import Depends, Request
+from fastapi.responses import JSONResponse
 from fastapi_users import BaseUserManager, UUIDIDMixin, models, exceptions
 from fastapi_users.jwt import generate_jwt, decode_jwt
 import jwt  
 
 from repositories.users import  get_user_db
 from models.users import UserORM
+from utils.emails import send_verify_message
 from utils.settings import getSettings
 from logging import getLogger
 
@@ -29,12 +31,13 @@ class UserManager(UUIDIDMixin, BaseUserManager[UserORM, uuid.UUID]):
 
     async def on_after_request_verify(
         self, user: UserORM, token: str, request: Optional[Request] = None
-    ):
+    )-> JSONResponse:
         logger.warning(f"Verification requested for user {user.id}. Verification token: {token}")
+        return await send_verify_message(email=user.email, token=token)
     
     async def request_verify(
         self, user: models.UP, request: Optional[Request] = None
-    ) -> None:
+    ) -> JSONResponse:
         if not user.is_active:
             raise exceptions.UserInactive()
         if user.is_verified:
@@ -50,7 +53,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[UserORM, uuid.UUID]):
             self.verification_token_secret,
             self.verification_token_lifetime_seconds,
         )
-        await self.on_after_request_verify(user, token, request)
+        return await self.on_after_request_verify(user, token, request)
 
     async def verify(self, token: str, request: Optional[Request] = None) -> models.UP:
         try:

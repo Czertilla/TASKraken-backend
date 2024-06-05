@@ -1,0 +1,46 @@
+{
+    "version": 1,
+    "formatters": {
+        "standard": {
+            "format": "{asctime} {levelname}:{name}> {message}",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+            "style": "{"
+        },
+        "sql_format": {
+            "format": "{asctime} {levelname}:{name} SQL: \n{message}",
+            "datefmt": "%Y-%m-%d %H:%M:%S.%f",
+            "style": "{"
+        }
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "level": "INFO",
+            "formatter": "standard"
+        },
+        "filelog": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/logFiles/debug.log",
+            "mode": "a",
+            "maxBytes": 4194304,
+            "backupCount": 16,
+            "formatter": "standard",
+            "level": "DEBUG"
+        }
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO"
+    },
+    "loggers": {
+        "__main__": {
+            "handlers": ["filelog"],
+            "level": "DEBUG",
+            "propagate": true
+        },
+        "SQL": {
+            "handlers": ["console", "filelog"],
+            "level": "DEBUG"
+        }
+    }
+}

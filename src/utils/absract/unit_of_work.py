@@ -1,27 +1,26 @@
 from abc import ABC, abstractmethod
 from typing import Type
 
-from repositories.camerus import CamerusRepo
-from repositories.cameras import CameraRepo
-from repositories.carowners import CarOwnerRepo
-from repositories.cases import CaseRepo
-from repositories.export import ExportRepo
-from repositories.files import FileRepo
+from repositories.checklists import CheckListRepo
+from repositories.files import FileRepo, FolderRepo
+from repositories.projects import ProjectRepo
+from repositories.rights import RightRepo
+from repositories.roles import RoleRepo
+from repositories.structures import StructureRepo
+from repositories.tasks import TaskRepo
 from repositories.users import UserRepo
-from repositories.violations import ViolationRepo
-from repositories.votes import VoteRepo
 
 
 class ABCUnitOfWork(ABC):
-    cameras: Type[CameraRepo]
-    camerus: Type[CamerusRepo]
-    cases: Type[CaseRepo]
-    car_owners: Type[CarOwnerRepo]
-    export: Type[ExportRepo]
     files: Type[FileRepo]
+    folders: Type[FolderRepo]
     users: Type[UserRepo]
-    violations: Type[ViolationRepo]
-    votes: Type[VoteRepo]
+    roles: Type[RoleRepo]
+    rights: Type[RightRepo]
+    structs: Type[StructureRepo]
+    projects: Type[ProjectRepo]
+    tasks: Type[TaskRepo]
+    checklists: Type[CheckListRepo]
 
     @abstractmethod
     def __init__(self):
