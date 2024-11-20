@@ -1,24 +1,20 @@
-from typing import Annotated
-from uuid import UUID
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter
 
 from api.auth.auth import fastapi_users
 from api.dependencies import UsersUOWDep
-from models.users import UserORM
-from schemas.projects import SCreateProjectRequest, SCreateTaskRequest
+from schemas.users import SCheckResponse
 from services.users import UserService
 
 verified_user = fastapi_users.current_user(verified=True, superuser=False) 
 
 users_router = APIRouter(prefix="/user", tags=["user"])
 
-@users_router.get("/")
-async def get_some(
-    user: Annotated[UserORM, Depends(verified_user)],
+@users_router.get("/check/{username}")
+async def check_username(
     uow: UsersUOWDep,
-    request: SCreateTaskRequest = Depends()
-    ):
-    response = await UserService(uow).get_some(user)
-    if response is None:
-        raise HTTPException(status_code=404, detail="Case with appropriate skill value not found")
-    return Response(content=response.photo, media_type="image/png")
+    username: str
+) -> SCheckResponse:
+    return SCheckResponse(
+        username=username, 
+        exists=(await UserService(uow).check_username(username))
+    )
