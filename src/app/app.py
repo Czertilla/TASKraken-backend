@@ -7,7 +7,9 @@ app = FastAPI(**Settings().app_presets)
 
 origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
+    "http://taskraken.czertilla.ru",
+    "https://taskraken.czertilla.ru"
 ]
 
 app.add_middleware(
