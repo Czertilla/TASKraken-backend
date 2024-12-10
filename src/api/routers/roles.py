@@ -1,6 +1,6 @@
 from typing import Annotated
 from uuid import UUID
-from fastapi import APIRouter, Cookie, Depends
+from fastapi import APIRouter, Cookie, Depends, Request
 from fastapi.responses import JSONResponse
 from fastapi_filter import FilterDepends
 
@@ -27,7 +27,6 @@ async def search_roles(
     pagination: SPaginationRequest = Depends()
 ) -> SRoleSearchResponse:
     return await RoleService(uow).search(filters, pagination)
-
 
 @roles.get("/my-roles")
 async def my_roles(

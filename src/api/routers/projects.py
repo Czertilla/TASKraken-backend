@@ -34,7 +34,7 @@ async def my_projects(
     pagination: SPaginationRequest = Depends()
 ) -> SMyProjectsResponse:
     if (status:= await RoleService(uow).check_role(user, role_id)) != CheckRoleStatus.belong:
-        raise HTTPException(status_code=422, detail=status)
+        raise HTTPException(status_code=422, detail=status.value)
     return await ProjectService(uow).get_project_by_creator_id(role_id, pagination)
 
 
