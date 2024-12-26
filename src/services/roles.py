@@ -73,6 +73,7 @@ class RoleService(BaseService):
             ).model_dump(mode="json")
             response = JSONResponse(content=content)
             response.set_cookie(key="role_id", value=role_id)
+            response.delete_cookie(key="project_id")
             return response
         else:
             raise HTTPException(
